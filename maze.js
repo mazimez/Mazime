@@ -191,28 +191,28 @@ let ball = Bodies.circle(
 World.add(world,ball);
 document.addEventListener('keydown',event=>{
     const {x,y} = ball.velocity;
-    if(event.keyCode===87){
+    if (event.key === 'w' || event.key === 'ArrowUp') {
         if(y<-15){
             //
         }else{
             Body.setVelocity(ball,{x,y:y-3});
         }
     }
-    if(event.keyCode===83){
+    if (event.key === 's' || event.key === 'ArrowDown') {
         if(y>15){
             //
         }else{
             Body.setVelocity(ball,{x,y:y+3});
         }
     }
-    if(event.keyCode===65){
+    if (event.key === 'a' || event.key === 'ArrowLeft') {
         if(x<-15){
             //
         }else{
             Body.setVelocity(ball,{x:x-3,y});   
         }
     }
-    if(event.keyCode===68){
+    if (event.key === 'd' || event.key === 'ArrowRight') {
         if(x>15){
             //
         }else{
