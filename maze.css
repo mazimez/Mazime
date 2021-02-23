@@ -1,5 +1,6 @@
-body{
-    margin: 0px;
+body, html{
+    margin: 0;
+    padding: 0;
 }
 .hidden{
     display: none !important;
@@ -10,8 +11,7 @@ h1{
 }
 .winner{
     display: grid;
-    justify-content: center;
-    align-items: center;
+    place-items: center;
     position: absolute;
     z-index: 1;
     height: 100vh;
