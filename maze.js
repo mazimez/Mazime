@@ -497,11 +497,45 @@ var h = window.innerHeight;
 if (w <= 500 && h <= 800) {
     console.log("phone mode is");
     let acl = new Accelerometer({ frequency: 60 });
-
     acl.start();
     let p = document.getElementById('test');
     setInterval(function () {
         console.log("Acceleration along the X-axis " + acl.x);
-        p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
+        // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
+
+        const { x, y } = ball.velocity;
+        //up
+        if (acl.y < -2) {
+            if (y < -15) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y - 3 });
+            }
+        }
+        //down
+        if (acl.y > 2) {
+            if (y > 15) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y + 3 });
+            }
+        }
+        //left
+        if (acl.x < -2) {
+            if (x < -15) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x - 3, y });
+            }
+        }
+        //right
+        if (acl.x > 2) {
+            if (x > 15) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x + 3, y });
+            }
+        }
+
     }, 1000);
 }
