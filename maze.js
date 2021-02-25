@@ -519,7 +519,7 @@ if (w <= 500 && h <= 800) {
             if (y < -speedlimit) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
+                Body.setVelocity(ball, { y: y - (Math.abs(speedy) * rate) });
             }
         }
         //down
@@ -527,7 +527,7 @@ if (w <= 500 && h <= 800) {
             if (y > speedlimit) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
+                Body.setVelocity(ball, { y: y + (Math.abs(speedy) * rate) });
             }
         }
         //left
@@ -535,7 +535,7 @@ if (w <= 500 && h <= 800) {
             if (x < -speedlimit) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
+                Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate) });
             }
         }
         //right
@@ -543,7 +543,7 @@ if (w <= 500 && h <= 800) {
             if (x > speedlimit) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
+                Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate) });
             }
         }
 
