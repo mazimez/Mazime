@@ -2,10 +2,10 @@ const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
 const width = window.innerWidth - 5;
 const height = window.innerHeight - 5;
-//const cells=10;
+let cells = 10;
 let cellsHorizontal = 5;
 let cellsVertical = 5;
-
+let speedlimit = 15;
 //const unitLength = width/cells;
 let unitLengthX = width / cellsHorizontal;
 let unitLengthY = height / cellsVertical;
@@ -122,7 +122,7 @@ const createMaze = () => {
                 columnIndex * unitLengthX + (unitLengthX / 2),
                 (rowIndex + 1) * unitLengthY,
                 unitLengthX,
-                10,
+                cells,
                 {
                     label: 'wall',
                     isStatic: true,
@@ -143,7 +143,7 @@ const createMaze = () => {
             const wall = Bodies.rectangle(
                 (columnIndex + 1) * unitLengthX,
                 rowIndex * unitLengthY + (unitLengthY / 2),
-                10,
+                cells,
                 unitLengthY,
                 {
                     label: 'wall',
@@ -192,28 +192,28 @@ World.add(world, ball);
 document.addEventListener('keydown', event => {
     const { x, y } = ball.velocity;
     if (event.key === 'w' || event.key === 'ArrowUp') {
-        if (y < -15) {
+        if (y < -speedlimit) {
             //
         } else {
             Body.setVelocity(ball, { x, y: y - 3 });
         }
     }
     if (event.key === 's' || event.key === 'ArrowDown') {
-        if (y > 15) {
+        if (y > speedlimit) {
             //
         } else {
             Body.setVelocity(ball, { x, y: y + 3 });
         }
     }
     if (event.key === 'a' || event.key === 'ArrowLeft') {
-        if (x < -15) {
+        if (x < -speedlimit) {
             //
         } else {
             Body.setVelocity(ball, { x: x - 3, y });
         }
     }
     if (event.key === 'd' || event.key === 'ArrowRight') {
-        if (x > 15) {
+        if (x > speedlimit) {
             //
         } else {
             Body.setVelocity(ball, { x: x + 3, y });
@@ -264,6 +264,8 @@ const nextLevel = () => {
 
     cellsHorizontal = cellsHorizontal + 3;
     cellsVertical = cellsVertical + 3;
+    cells = cells - 1;
+    speedlimit = speedlimit - 2;
 
     unitLengthX = width / cellsHorizontal;
     unitLengthY = height / cellsVertical;
@@ -509,7 +511,7 @@ if (w <= 500 && h <= 800) {
         let rate = 0.7;
         //up
         if (speedy <= -1) {
-            if (y < -15) {
+            if (y < -speedlimit) {
                 //
             } else {
                 Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
@@ -517,7 +519,7 @@ if (w <= 500 && h <= 800) {
         }
         //down
         if (speedy > 2) {
-            if (y > 15) {
+            if (y > speedlimit) {
                 //
             } else {
                 Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
@@ -525,7 +527,7 @@ if (w <= 500 && h <= 800) {
         }
         //left
         if (speedx > 2) {
-            if (x < -15) {
+            if (x < -speedlimit) {
                 //
             } else {
                 Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
@@ -533,12 +535,12 @@ if (w <= 500 && h <= 800) {
         }
         //right
         if (speedx < -2) {
-            if (x > 15) {
+            if (x > speedlimit) {
                 //
             } else {
                 Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
             }
         }
 
-    }, 100);
+    }, 10);
 }
