@@ -521,7 +521,7 @@ if (w <= 500 && h <= 800) {
             }
         }
         //left
-        if (acl.x < -2) {
+        if (acl.x > 2) {
             if (x < -15) {
                 //
             } else {
@@ -529,7 +529,7 @@ if (w <= 500 && h <= 800) {
             }
         }
         //right
-        if (acl.x > 2) {
+        if (acl.x < -2) {
             if (x > 15) {
                 //
             } else {
