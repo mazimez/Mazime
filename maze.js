@@ -495,7 +495,7 @@ var w = window.innerWidth;
 var h = window.innerHeight;
 
 if (w <= 500 && h <= 800) {
-    console.log("phone mode is");
+    console.log("phone mode is on");
     let acl = new Accelerometer({ frequency: 60 });
     acl.start();
     let p = document.getElementById('test');
@@ -504,12 +504,15 @@ if (w <= 500 && h <= 800) {
         // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
 
         const { x, y } = ball.velocity;
+        let x = Math.ceil(acl.x);
+        let y = Math.ceil(acl.y);
+        let rate = 0.7;
         //up
-        if (acl.y < -2) {
+        if (y <= -1) {
             if (y < -15) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y - 3 });
+                Body.setVelocity(ball, { x, y: y - (Math.abs(y) * rate) });
             }
         }
         //down
@@ -517,7 +520,7 @@ if (w <= 500 && h <= 800) {
             if (y > 15) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y + 3 });
+                Body.setVelocity(ball, { x, y: y + (Math.abs(y) * rate) });
             }
         }
         //left
@@ -525,7 +528,7 @@ if (w <= 500 && h <= 800) {
             if (x < -15) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x - 3, y });
+                Body.setVelocity(ball, { x: x - (Math.abs(x) * rate), y });
             }
         }
         //right
@@ -533,7 +536,7 @@ if (w <= 500 && h <= 800) {
             if (x > 15) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x + 3, y });
+                Body.setVelocity(ball, { x: x + (Math.abs(x) * rate), y });
             }
         }
 
