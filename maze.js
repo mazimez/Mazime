@@ -500,7 +500,7 @@ if (w <= 500 && h <= 800) {
     acl.start();
     let p = document.getElementById('test');
     setInterval(function () {
-        console.log("Acceleration along the X-axis " + acl.x);
+        // console.log("Acceleration along the X-axis " + acl.x);
         // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
 
         const { x, y } = ball.velocity;
