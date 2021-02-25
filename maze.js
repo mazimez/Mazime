@@ -323,6 +323,9 @@ let lVerticals;
 let lHorizontals;
 
 const cheatOn = () => {
+    document.querySelector('#cheaton').classList.add('hidden');
+    document.querySelector('#cheatoff').classList.remove('hidden');
+
     cheatGrid = Array(cellsVertical)
         .fill(null)
         .map(() => Array(cellsHorizontal).fill(false));
@@ -481,6 +484,8 @@ const solve = (row, column) => {
 }
 let off = [];
 const cheatOff = () => {
+    document.querySelector('#cheaton').classList.remove('hidden');
+    document.querySelector('#cheatoff').classList.add('hidden');
     world.bodies.forEach(body => {
         if (body.label === 'line') {
             off.push(body);
