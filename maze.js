@@ -518,7 +518,7 @@ if (w <= 500 && h <= 800) {
             }
         }
         //down
-        if (speedy > 2) {
+        if (speedy > 1) {
             if (y > speedlimit) {
                 //
             } else {
@@ -526,7 +526,7 @@ if (w <= 500 && h <= 800) {
             }
         }
         //left
-        if (speedx > 2) {
+        if (speedx > 1) {
             if (x < -speedlimit) {
                 //
             } else {
@@ -534,7 +534,7 @@ if (w <= 500 && h <= 800) {
             }
         }
         //right
-        if (speedx < -2) {
+        if (speedx < -1) {
             if (x > speedlimit) {
                 //
             } else {
