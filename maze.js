@@ -504,39 +504,39 @@ if (w <= 500 && h <= 800) {
         // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
 
         const { x, y } = ball.velocity;
-        let x = Math.ceil(acl.x);
-        let y = Math.ceil(acl.y);
+        let speedx = Math.ceil(acl.x);
+        let speedy = Math.ceil(acl.y);
         let rate = 0.7;
         //up
-        if (y <= -1) {
+        if (speedy <= -1) {
             if (y < -15) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y - (Math.abs(y) * rate) });
+                Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
             }
         }
         //down
-        if (acl.y > 2) {
+        if (speedy > 2) {
             if (y > 15) {
                 //
             } else {
-                Body.setVelocity(ball, { x, y: y + (Math.abs(y) * rate) });
+                Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
             }
         }
         //left
-        if (acl.x > 2) {
+        if (speedx > 2) {
             if (x < -15) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x - (Math.abs(x) * rate), y });
+                Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
             }
         }
         //right
-        if (acl.x < -2) {
+        if (speedx < -2) {
             if (x > 15) {
                 //
             } else {
-                Body.setVelocity(ball, { x: x + (Math.abs(x) * rate), y });
+                Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
             }
         }
 
