@@ -189,38 +189,100 @@ let ball = Bodies.circle(
     }
 );
 World.add(world, ball);
-document.addEventListener('keydown', event => {
-    const { x, y } = ball.velocity;
-    if (event.key === 'w' || event.key === 'ArrowUp') {
-        if (y < -speedlimit) {
-            //
-        } else {
-            Body.setVelocity(ball, { x, y: y - 3 });
-        }
-    }
-    if (event.key === 's' || event.key === 'ArrowDown') {
-        if (y > speedlimit) {
-            //
-        } else {
-            Body.setVelocity(ball, { x, y: y + 3 });
-        }
-    }
-    if (event.key === 'a' || event.key === 'ArrowLeft') {
-        if (x < -speedlimit) {
-            //
-        } else {
-            Body.setVelocity(ball, { x: x - 3, y });
-        }
-    }
-    if (event.key === 'd' || event.key === 'ArrowRight') {
-        if (x > speedlimit) {
-            //
-        } else {
-            Body.setVelocity(ball, { x: x + 3, y });
-        }
-    }
 
-})
+//ball controls (for phone and PC)
+var w = window.innerWidth;
+var h = window.innerHeight;
+
+if (w <= 500 && h <= 800) {
+    console.log("phone mode is on");
+    let acl = new Accelerometer({ frequency: 60 });
+    acl.start();
+    let p = document.getElementById('test');
+    setInterval(function () {
+        // console.log("Acceleration along the X-axis " + acl.x);
+        // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
+        const { x, y } = ball.velocity;
+        let speedx = Math.ceil(acl.x);
+        let speedy = Math.ceil(acl.y);
+        let rate = 0.7;
+        //up
+        if (speedy <= -1) {
+            if (y < -speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
+            }
+        }
+        //down
+        if (speedy > 1) {
+            if (y > speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
+            }
+        }
+        //left
+        if (speedx > 1) {
+            if (x < -speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
+            }
+        }
+        //right
+        if (speedx < -1) {
+            if (x > speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
+            }
+        }
+
+    }, 100);
+} else {
+    console.log("PC mode is on");
+    var keyState = {};
+    document.addEventListener('keydown', function (e) {
+        keyState[e.key] = true;
+    });
+    document.addEventListener('keyup', function (e) {
+        keyState[e.key] = false;
+    });
+
+    setInterval(function () {
+        const { x, y } = ball.velocity;
+        console.log('x is ' + x + " and y is " + y);
+        if (keyState['w'] || keyState['ArrowUp']) {
+            if (y < -speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y - 3 });
+            }
+        }
+        if (keyState['s'] || keyState['ArrowDown']) {
+            if (y > speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x, y: y + 3 });
+            }
+        }
+        if (keyState['a'] || keyState['ArrowLeft']) {
+            if (x < -speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x - 3, y });
+            }
+        }
+        if (keyState['d'] || keyState['ArrowRight']) {
+            if (x > speedlimit) {
+                //
+            } else {
+                Body.setVelocity(ball, { x: x + 3, y });
+            }
+        }
+    }, 100);
+}
 
 //win condition
 let out = [];
@@ -497,55 +559,3 @@ const cheatOff = () => {
 }
 
 
-//for phones(accelometer)
-var w = window.innerWidth;
-var h = window.innerHeight;
-
-if (w <= 500 && h <= 800) {
-    console.log("phone mode is on");
-    let acl = new Accelerometer({ frequency: 60 });
-    acl.start();
-    let p = document.getElementById('test');
-    setInterval(function () {
-        // console.log("Acceleration along the X-axis " + acl.x);
-        // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
-
-        const { x, y } = ball.velocity;
-        let speedx = Math.ceil(acl.x);
-        let speedy = Math.ceil(acl.y);
-        let rate = 0.7;
-        //up
-        if (speedy <= -1) {
-            if (y < -speedlimit) {
-                //
-            } else {
-                Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
-            }
-        }
-        //down
-        if (speedy > 1) {
-            if (y > speedlimit) {
-                //
-            } else {
-                Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
-            }
-        }
-        //left
-        if (speedx > 1) {
-            if (x < -speedlimit) {
-                //
-            } else {
-                Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
-            }
-        }
-        //right
-        if (speedx < -1) {
-            if (x > speedlimit) {
-                //
-            } else {
-                Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
-            }
-        }
-
-    }, 100);
-}
