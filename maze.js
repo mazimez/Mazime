@@ -252,7 +252,6 @@ if (w <= 500 && h <= 800) {
 
     setInterval(function () {
         const { x, y } = ball.velocity;
-        console.log('x is ' + x + " and y is " + y);
         if (keyState['w'] || keyState['ArrowUp']) {
             if (y < -speedlimit) {
                 //
@@ -294,7 +293,8 @@ Events.on(engine, 'collisionStart', event => {
                 document.querySelector("#next").remove();
             }
             document.querySelector('.winner').classList.remove('hidden');
-            world.gravity.y = 1;
+            document.addEventListener('keypress', enterEvent);
+            // world.gravity.y = 1;
             world.bodies.forEach(body => {
                 if (body.label === 'wall') {
                     Body.setStatic(body, false);
@@ -304,6 +304,12 @@ Events.on(engine, 'collisionStart', event => {
         }
     });
 });
+function enterEvent(event) {
+    if (event.key === 'Enter') {
+        document.removeEventListener('keypress', enterEvent);
+        nextLevel();
+    }
+}
 
 //next Level
 const nextLevel = () => {
