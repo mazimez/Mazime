@@ -1,18 +1,21 @@
+
+//initializing the constants and engine from the matter libarary
 const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
-const width = window.innerWidth - 5;
-const height = window.innerHeight - 5;
-let cells = 10;
-let cellsHorizontal = 5;
-let cellsVertical = 5;
-let speedlimit = 15;
-//const unitLength = width/cells;
-let unitLengthX = width / cellsHorizontal;
-let unitLengthY = height / cellsVertical;
+const width = window.innerWidth - 5; //the actual width of the part where matter will render it's engine
+const height = window.innerHeight - 5; //the actual height of the part where matter will render it's engine
+let cellsWidth = 10;  //the thickness of the lines
+let cellsHorizontal = 5; //amount of columns at start
+let cellsVertical = 5; //amount of rows at start
+let speedlimit = 15; //speedlimit of ball at
+let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
+let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
 
-const engine = Engine.create();
-engine.world.gravity.y = 0;
-const { world } = engine;
+const engine = Engine.create(); //creating the engine for all the matter to work
+engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
+const { world } = engine; //getting the world variable from the engine
+
+//creating the render object on the body tag of HTML file with dimentions
 const render = Render.create({
     element: document.body,
     engine: engine,
@@ -22,21 +25,29 @@ const render = Render.create({
         height
     }
 });
-Render.run(render);
-Runner.run(Runner.create(), engine);
+Render.run(render); //start the rendering to show the world in HTML file
+Runner.run(Runner.create(), engine); //attaching the engine with rendered world
 
 
-//walls
+//creating the array of the walls(ractangles) that cover the world
+// Bodies.rectangle(
+//     "x-position of this object",
+//     "y-position of this object",
+//     "width of this object",
+//     "height of this object",
+//     "any other options you want to add"
+// ),
 const walls = [
-    Bodies.rectangle(width / 2, 0, width, 10, { isStatic: true }),
-    Bodies.rectangle(width / 2, height, width, 10, { isStatic: true }),
-    Bodies.rectangle(0, height / 2, 10, height, { isStatic: true }),
-    Bodies.rectangle(width, height / 2, 10, height, { isStatic: true }),
+    Bodies.rectangle(width / 2, 0, width, 10, { isStatic: true }), //upper wall
+    Bodies.rectangle(width / 2, height, width, 10, { isStatic: true }), //lower wall
+    Bodies.rectangle(0, height / 2, 10, height, { isStatic: true }), //wall at left side
+    Bodies.rectangle(width, height / 2, 10, height, { isStatic: true }), //wall at right side
 ];
-World.add(world, walls);
+World.add(world, walls); //adding the wall array to world so it shows on HTML file
 
 //maze generation
 
+//function to shuffle the array 
 const shuffle = (arr) => {
     let counter = arr.length;
     while (counter > 0) {
@@ -48,147 +59,192 @@ const shuffle = (arr) => {
     }
     return arr;
 }
+
+
+//array that store the data of visited/unvisited cells
 let grid = Array(cellsVertical)
     .fill(null)
     .map(() => Array(cellsHorizontal).fill(false));
 
+//array that stores the data of vertical lines/blocks/rectanglex 
 let verticals = Array(cellsVertical)
     .fill(null)
     .map(() => Array(cellsHorizontal - 1).fill(false));
 
+
+//array that stores the data of horizontal lines/block/rectangle
 let horizontals = Array(cellsVertical - 1)
     .fill(null)
     .map(() => Array(cellsHorizontal).fill(false));
 
-let startRow = Math.floor(Math.random() * cellsVertical);
-let startColumn = Math.floor(Math.random() * cellsHorizontal)
 
+//function that goes throw each and every cells in maze and also update the arrays
 const stepThroughCell = (row, column) => {
-    //if visited => return
+    //if cell is already visited, no need to do anything else
     if (grid[row][column]) {
         return;
-    }
+    } else {
+        //if cell is not visited, mark it visited first
+        grid[row][column] = true;
 
-    //mark cell as visited
-    grid[row][column] = true;
+        //creat the array of that cell's neighbor cells and shuffle them to randomly go throw each one
+        const neighbors = shuffle([
+            [row - 1, column, 'up'],
+            [row, column + 1, 'right'],
+            [row + 1, column, 'down'],
+            [row, column - 1, 'left']
+        ]);
 
-    //assemble list of neighbour
-    const neighbors = shuffle([
-        [row - 1, column, 'up'],
-        [row, column + 1, 'right'],
-        [row + 1, column, 'down'],
-        [row, column - 1, 'left']
-    ]);
+        //go throw each neighbor cell and repeat the process untill every cell gets visited
+        for (let neighbor of neighbors) {
+            //getting the neighbor's row-column-direction to use in algorithm
+            const [nextRow, nextColumn, direction] = neighbor;
 
-    //for each neighbour
-    for (let neighbor of neighbors) {
-        //see if neigbour is out of bounds
-        const [nextRow, nextColumn, direction] = neighbor;
-        if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
-            continue;
+            //check if neigbour cell is out of bounds (if it is, just skip that cell)     
+            if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
+                continue;
+            }
+
+            //check if this cell is already visited (if it is, just skip that cell)
+            if (grid[nextRow][nextColumn]) {
+                continue;
+            }
+
+
+            /*
+            if cells not out of bound and not visied, 
+            then we can remove the wall/block/rectagle between that 2 cells
+            */
+            if (direction === 'left') {  //checking the direction to make sure which wall to remove
+                verticals[row][column - 1] = true;
+            } else if (direction === 'right') {
+                verticals[row][column] = true;
+            }
+            if (direction === 'up') {
+                horizontals[row - 1][column] = true;
+            } else if (direction === 'down') {
+                horizontals[row][column] = true;
+            }
+
+            //calling that methode again to repeat the same process for this cell(neighbor)
+            stepThroughCell(nextRow, nextColumn);
         }
-
-        //if we visited neigbour, contunie checking
-        if (grid[nextRow][nextColumn]) {
-            continue;
-        }
-
-        //remove wall
-        if (direction === 'left') {
-            verticals[row][column - 1] = true;
-        } else if (direction === 'right') {
-            verticals[row][column] = true;
-        }
-        if (direction === 'up') {
-            horizontals[row - 1][column] = true;
-        } else if (direction === 'down') {
-            horizontals[row][column] = true;
-        }
-
-        //visit next cell=> call again
-        stepThroughCell(nextRow, nextColumn);
     }
 };
 
+//randomly selecting one cell to start generating maze
+let startRow = Math.floor(Math.random() * cellsVertical);
+let startColumn = Math.floor(Math.random() * cellsHorizontal)
+
+
+//startnig the maze generation algorithm by calling this function
 stepThroughCell(startRow, startColumn);
 
+
+//making the function to create the maze with arrays using matter.js
 const createMaze = () => {
-    horizontals.forEach((row, rowIndex) => {
+
+    /*
+    going throw horizontal array to put 
+    block/wall/rectangle according to array's data
+    */
+    horizontals.forEach((row, rowIndex,) => {
         row.forEach((open, columnIndex) => {
+            /*
+            if the array's value is true, that means there are no wall at that point
+            so, we don't need to add wall here, simply return
+            */
             if (open) {
                 return;
-            }
-            const wall = Bodies.rectangle(
-                columnIndex * unitLengthX + (unitLengthX / 2),
-                (rowIndex + 1) * unitLengthY,
-                unitLengthX,
-                cells,
-                {
-                    label: 'wall',
-                    isStatic: true,
-                    render: {
-                        fillStyle: 'white'
+            } else {
+                /*
+                if the array's value is false, that means there are wall at that point
+                so, we need to add wall here, first create that wall(rectangle)
+                */
+                const wall = Bodies.rectangle(
+                    columnIndex * unitLengthX + (unitLengthX / 2), //calculating the center x-point of that rectangle
+                    (rowIndex + 1) * unitLengthY, //calculation the center y-point of that rectangle
+                    unitLengthX, //width of that rectangle will be unit lenght of x(because it's horizontal)
+                    cellsWidth, //height(thickness) of that rectangle 
+                    {
+                        label: 'wall',  //labeling the rectangle as wall
+                        isStatic: true, //making the wall static so it does't get effected by gravity
+                        render: {
+                            fillStyle: 'white'  //giving the color to wall
+                        }
                     }
-                }
-            );
-            World.add(world, wall);
+                );
+                World.add(world, wall); //adding the created rectangle into the world
+            }
         })
     });
 
+    /*
+    going throw verticals array to put 
+    block/wall/rectangle according to array's data
+    */
     verticals.forEach((row, rowIndex) => {
         row.forEach((open, columnIndex) => {
+            /*
+            if the array's value is true, that means there are no wall at that point
+            so, we don't need to add wall here, simply return
+            */
             if (open) {
                 return;
             }
             const wall = Bodies.rectangle(
-                (columnIndex + 1) * unitLengthX,
-                rowIndex * unitLengthY + (unitLengthY / 2),
-                cells,
-                unitLengthY,
+                (columnIndex + 1) * unitLengthX, //calculating the center x-point of that rectangle
+                rowIndex * unitLengthY + (unitLengthY / 2), //calculation the center y-point of that rectangle
+                cellsWidth, //width(thickness) of that rectangle 
+                unitLengthY, //height of that rectangle will be unit lenght of y(because it's vertical)
                 {
-                    label: 'wall',
-                    isStatic: true,
+                    label: 'wall', //labeling the rectangle as wall
+                    isStatic: true, //making the wall static so it does't get effected by gravity
                     render: {
-                        fillStyle: 'white'
+                        fillStyle: 'white' //giving the color to wall
                     }
                 }
             );
-            World.add(world, wall);
+            World.add(world, wall); //adding the created rectangle into the world
         })
     });
 
 }
-createMaze();
-//goal
-let goal = Bodies.rectangle(
-    width - (unitLengthX / 2),
-    height - (unitLengthY / 2),
-    unitLengthX * 0.6,
-    unitLengthY * 0.6,
-    {
-        isStatic: true,
-        label: 'goal',
-        render: {
-            fillStyle: 'green'
-        }
-    }
-);
-World.add(world, goal);
 
-//ball
-let ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
-let ball = Bodies.circle(
-    unitLengthX / 2,
-    unitLengthY / 2,
-    ballRadius,
+//calling the function to creat the maze according to array's data
+createMaze();
+
+
+//creating the goal to finish the game
+let goal = Bodies.rectangle(
+    width - (unitLengthX / 2), //calculating center x-point of the goal so it will be at bottom
+    height - (unitLengthY / 2), //calculating center y-point of the goal so it will be at bottom
+    unitLengthX * 0.6, //width of the goal block
+    unitLengthY * 0.6, //height of the goal block
     {
-        label: 'ball',
+        isStatic: true, //making it static so garvity goesn't effect it
+        label: 'goal', //labeling it as a goal
         render: {
-            fillStyle: 'blue'
+            fillStyle: 'green' //giving it a color
         }
     }
 );
-World.add(world, ball);
+World.add(world, goal); //adding the goal to the world
+
+//creating the ball to start the game
+let ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
+let ball = Bodies.circle(
+    unitLengthX / 2, //center x-point of the ball so it will be at top
+    unitLengthY / 2, //center y-point of the ball so it will be at top
+    ballRadius, //radius of the ball
+    {
+        label: 'ball', //labeling it as ball
+        render: {
+            fillStyle: 'blue' //giving it color
+        }
+    }
+);
+World.add(world, ball); //adding the ball to the world
 
 //ball controls (for phone and PC)
 var w = window.innerWidth;
@@ -332,7 +388,7 @@ const nextLevel = () => {
 
     cellsHorizontal = cellsHorizontal + 3;
     cellsVertical = cellsVertical + 3;
-    cells = cells - 1;
+    cellsWidth = cellsWidth - 1;
     speedlimit = speedlimit - 2;
 
     unitLengthX = width / cellsHorizontal;
