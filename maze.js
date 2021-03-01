@@ -386,10 +386,18 @@ const nextLevel = () => {
 
     engine.world.gravity.y = 0;
 
-    cellsHorizontal = cellsHorizontal + 3;
-    cellsVertical = cellsVertical + 3;
-    cellsWidth = cellsWidth - 1;
-    speedlimit = speedlimit - 2;
+    cellsHorizontal = cellsHorizontal + 1;
+    cellsVertical = cellsVertical + 1;
+    if (cellsWidth <= 1) {
+        cellsWidth = 1;
+    } else {
+        cellsWidth = cellsWidth - 1;
+    }
+    if (speedlimit <= 2) {
+        speedlimit = 2;
+    } else {
+        speedlimit = speedlimit - 1;
+    }
 
     unitLengthX = width / cellsHorizontal;
     unitLengthY = height / cellsVertical;
