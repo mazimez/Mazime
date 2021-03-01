@@ -10,6 +10,7 @@ let cellsVertical = 5; //amount of rows at start
 let speedlimit = 15; //speedlimit of ball at
 let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
+let level = 1 //the current level
 
 const engine = Engine.create(); //creating the engine for all the matter to work
 engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
@@ -340,7 +341,6 @@ if (w <= 500 && h <= 800) {
 }
 
 //win condition
-let out = [];
 Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach((collision) => {
         const labels = ['ball', 'goal'];
@@ -354,7 +354,6 @@ Events.on(engine, 'collisionStart', event => {
             world.bodies.forEach(body => {
                 if (body.label === 'wall') {
                     Body.setStatic(body, false);
-                    out.push(body);
                 }
             });
         }
@@ -370,84 +369,97 @@ function enterEvent(event) {
 //next Level
 const nextLevel = () => {
 
-    //removing the win tag
-    document.querySelector('.winner').classList.add('hidden');
-
-    //removing the old maze
-    out.forEach((body) => {
-        World.remove(world, body);
-    });
-    World.remove(world, ball);
-    World.remove(world, goal);
-
-    cheatOff();
-
-    //updating the data for next level
-
-    engine.world.gravity.y = 0;
-
-    cellsHorizontal = cellsHorizontal + 1;
-    cellsVertical = cellsVertical + 1;
-    if (cellsWidth <= 1) {
-        cellsWidth = 1;
+    if (level >= 20) {
+        console.log("no more level nor now");
     } else {
-        cellsWidth = cellsWidth - 1;
-    }
-    if (speedlimit <= 2) {
-        speedlimit = 2;
-    } else {
-        speedlimit = speedlimit - 1;
-    }
+        let out = [];
 
-    unitLengthX = width / cellsHorizontal;
-    unitLengthY = height / cellsVertical;
+        //removing the win tag
+        document.querySelector('.winner').classList.add('hidden');
 
-    grid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-
-    verticals = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal - 1).fill(false));
-
-    horizontals = Array(cellsVertical - 1)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-
-    startRow = Math.floor(Math.random() * cellsVertical);
-    startColumn = Math.floor(Math.random() * cellsHorizontal)
-
-    stepThroughCell(startRow, startColumn);
-    createMaze();
-
-    ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
-    ball = Bodies.circle(
-        unitLengthX / 2,
-        unitLengthY / 2,
-        ballRadius,
-        {
-            label: 'ball',
-            render: {
-                fillStyle: 'blue'
+        world.bodies.forEach(body => {
+            if (body.label === 'wall') {
+                out.push(body);
             }
-        }
-    );
-    World.add(world, ball);
+        });
 
-    goal = Bodies.rectangle(
-        width - (unitLengthX / 2),
-        height - (unitLengthY / 2),
-        unitLengthX * 0.6,
-        unitLengthY * 0.6,
-        {
-            isStatic: true,
-            label: 'goal',
-            render: {
-                fillStyle: 'green'
-            }
+        //removing the old maze
+        out.forEach((body) => {
+            World.remove(world, body);
+        });
+        World.remove(world, ball);
+        World.remove(world, goal);
+
+        cheatOff();
+
+        //updating the data for next level
+
+        engine.world.gravity.y = 0;
+
+        cellsHorizontal = cellsHorizontal + 1;
+        cellsVertical = cellsVertical + 1;
+        if (cellsWidth <= 1) {
+            cellsWidth = 1;
+        } else {
+            cellsWidth = cellsWidth - 1;
         }
-    );
-    World.add(world, goal);
+        if (speedlimit <= 4) {
+            speedlimit = 4;
+        } else {
+            speedlimit = speedlimit - 1;
+        }
+
+        unitLengthX = width / cellsHorizontal;
+        unitLengthY = height / cellsVertical;
+
+        grid = Array(cellsVertical)
+            .fill(null)
+            .map(() => Array(cellsHorizontal).fill(false));
+
+        verticals = Array(cellsVertical)
+            .fill(null)
+            .map(() => Array(cellsHorizontal - 1).fill(false));
+
+        horizontals = Array(cellsVertical - 1)
+            .fill(null)
+            .map(() => Array(cellsHorizontal).fill(false));
+
+        startRow = Math.floor(Math.random() * cellsVertical);
+        startColumn = Math.floor(Math.random() * cellsHorizontal)
+
+        stepThroughCell(startRow, startColumn);
+        createMaze();
+
+        ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
+        ball = Bodies.circle(
+            unitLengthX / 2,
+            unitLengthY / 2,
+            ballRadius,
+            {
+                label: 'ball',
+                render: {
+                    fillStyle: 'blue'
+                }
+            }
+        );
+        World.add(world, ball);
+
+        goal = Bodies.rectangle(
+            width - (unitLengthX / 2),
+            height - (unitLengthY / 2),
+            unitLengthX * 0.6,
+            unitLengthY * 0.6,
+            {
+                isStatic: true,
+                label: 'goal',
+                render: {
+                    fillStyle: 'green'
+                }
+            }
+        );
+        World.add(world, goal);
+        level++;
+    }
 }
 
 let cheatGrid;
