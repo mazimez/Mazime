@@ -360,7 +360,7 @@ Events.on(engine, 'collisionStart', event => {
     });
 });
 function enterEvent(event) {
-    if (event.key === 'Enter') {
+    if (['Enter', 'Space'].includes(event.key)) {
         document.removeEventListener('keypress', enterEvent);
         nextLevel();
     }
