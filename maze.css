@@ -22,3 +22,11 @@ h1{
     font-size: 70px;
     font-family: Arial, Helvetica, sans-serif
 }
+.cheat{
+    display: grid;
+    place-items: center;
+    position: absolute;
+    bottom:10px;    
+    right:10px;
+    z-index: 1;
+}
