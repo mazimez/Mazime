@@ -61,7 +61,7 @@ const shuffle = (arr) => {
     return arr;
 }
 
-
+// test
 //array that store the data of visited/unvisited cells
 let grid = Array(cellsVertical)
     .fill(null)
