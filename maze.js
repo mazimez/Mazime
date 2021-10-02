@@ -7,7 +7,7 @@ const height = window.innerHeight - 5; //the actual height of the part where mat
 let cellsWidth = 10;  //the thickness of the lines
 let cellsHorizontal = 5; //amount of columns at start
 let cellsVertical = 5; //amount of rows at start
-let speedlimit = 15; //speedlimit of ball at
+let speedlimit = 15; //speedlimit of ball
 let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
 let level = 1 //the current level
@@ -30,7 +30,7 @@ Render.run(render); //start the rendering to show the world in HTML file
 Runner.run(Runner.create(), engine); //attaching the engine with rendered world
 
 
-//creating the array of the walls(ractangles) that cover the world
+//creating the array of the walls(rectangles) that cover the world
 // Bodies.rectangle(
 //     "x-position of this object",
 //     "y-position of this object",
@@ -61,13 +61,12 @@ const shuffle = (arr) => {
     return arr;
 }
 
-
 //array that store the data of visited/unvisited cells
 let grid = Array(cellsVertical)
     .fill(null)
     .map(() => Array(cellsHorizontal).fill(false));
 
-//array that stores the data of vertical lines/blocks/rectanglex 
+//array that stores the data of vertical lines/blocks/rectangles 
 let verticals = Array(cellsVertical)
     .fill(null)
     .map(() => Array(cellsHorizontal - 1).fill(false));
@@ -77,6 +76,15 @@ let verticals = Array(cellsVertical)
 let horizontals = Array(cellsVertical - 1)
     .fill(null)
     .map(() => Array(cellsHorizontal).fill(false));
+
+//function to get the number of rows that the given object is in
+const getRow = (object) => {
+    return (parseInt(object.position.y / unitLengthY));
+}
+//function to get the number of columns that the given object is in
+const getColumn = (object) => {
+    return (parseInt(object.position.x / unitLengthX));
+}
 
 
 //function that goes throw each and every cells in maze and also update the arrays
@@ -96,7 +104,7 @@ const stepThroughCell = (row, column) => {
             [row, column - 1, 'left']
         ]);
 
-        //go throw each neighbor cell and repeat the process untill every cell gets visited
+        //go throw each neighbor cell and repeat the process until every cell gets visited
         for (let neighbor of neighbors) {
             //getting the neighbor's row-column-direction to use in algorithm
             const [nextRow, nextColumn, direction] = neighbor;
@@ -113,8 +121,8 @@ const stepThroughCell = (row, column) => {
 
 
             /*
-            if cells not out of bound and not visied, 
-            then we can remove the wall/block/rectagle between that 2 cells
+            if cells not out of bound and not visited, 
+            then we can remove the wall/block/rectangle between that 2 cells
             */
             if (direction === 'left') {  //checking the direction to make sure which wall to remove
                 verticals[row][column - 1] = true;
@@ -127,7 +135,7 @@ const stepThroughCell = (row, column) => {
                 horizontals[row][column] = true;
             }
 
-            //calling that methode again to repeat the same process for this cell(neighbor)
+            //calling that method again to repeat the same process for this cell(neighbor)
             stepThroughCell(nextRow, nextColumn);
         }
     }
@@ -138,7 +146,7 @@ let startRow = Math.floor(Math.random() * cellsVertical);
 let startColumn = Math.floor(Math.random() * cellsHorizontal)
 
 
-//startnig the maze generation algorithm by calling this function
+//starting the maze generation algorithm by calling this function
 stepThroughCell(startRow, startColumn);
 
 
@@ -223,7 +231,7 @@ let goal = Bodies.rectangle(
     unitLengthX * 0.6, //width of the goal block
     unitLengthY * 0.6, //height of the goal block
     {
-        isStatic: true, //making it static so garvity goesn't effect it
+        isStatic: true, //making it static so gravity doesn't effect it
         label: 'goal', //labeling it as a goal
         render: {
             fillStyle: 'green' //giving it a color
@@ -479,7 +487,7 @@ const cheatOn = () => {
     lHorizontals = Array(cellsVertical)
         .fill(null)
         .map(() => Array(cellsHorizontal - 1).fill(true));
-    solve(0, 0);
+    solve(getRow(ball), getColumn(ball));
     createLine();
 }
 const createLine = () => {
