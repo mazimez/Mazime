@@ -172,8 +172,8 @@ const createMaze = () => {
                 */
                 const wall = Bodies.rectangle(
                     columnIndex * unitLengthX + (unitLengthX / 2), //calculating the center x-point of that rectangle
-                    (rowIndex + 1) * unitLengthY, //calculation the center y-point of that rectangle
-                    unitLengthX, //width of that rectangle will be unit lenght of x(because it's horizontal)
+                    ((rowIndex + 1) * unitLengthY) - 5, //calculation the center y-point of that rectangle
+                    unitLengthX + 10, //width of that rectangle will be unit lenght of x(because it's horizontal)
                     cellsWidth, //height(thickness) of that rectangle 
                     {
                         label: 'wall',  //labeling the rectangle as wall

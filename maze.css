@@ -1,3 +1,8 @@
+* { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  * { font-family: 'Inter var', sans-serif; }
+}
+
 body, html{
     margin: 0;
     padding: 0;
@@ -20,7 +25,6 @@ h1{
 .winner button{
     background-color: green;
     font-size: 70px;
-    font-family: Arial, Helvetica, sans-serif
 }
 .cheat{
     display: grid;
