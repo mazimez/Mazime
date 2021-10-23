@@ -474,10 +474,13 @@ let cheatGrid;
 let lVerticals;
 let lHorizontals;
 
+let is_win = 0;
+
 const cheatOn = () => {
     document.querySelector('#cheaton').classList.add('hidden');
     document.querySelector('#cheatoff').classList.remove('hidden');
 
+    is_win = 0;
     cheatGrid = Array(cellsVertical)
         .fill(null)
         .map(() => Array(cellsHorizontal).fill(false));
@@ -548,8 +551,14 @@ const createLine = () => {
 }
 const solve = (row, column) => {
     //check if node we are on is already in array path or we reach to goal
+    if (cheatGrid[cellsHorizontal - 1][cellsVertical - 1]) {
+        if (is_win) {
+            is_win = 1;
+            return 1;
+        }
+    }
     if (cheatGrid[row][column] || cheatGrid[cellsHorizontal - 1][cellsVertical - 1]) {
-        return;
+        return 0;
     }
 
     //making node visited to puch in array soon
@@ -605,8 +614,8 @@ const solve = (row, column) => {
                 continue;
             }
         }
-        solve(nextRow, nextColumn);
-        if (cheatGrid[cellsHorizontal - 1][cellsVertical - 1]) {
+        should_stay = solve(nextRow, nextColumn);
+        if (cheatGrid[cellsHorizontal - 1][cellsVertical - 1] && should_stay) {
 
         } else {
             if (direction === 'up') {
@@ -633,6 +642,7 @@ const solve = (row, column) => {
 
 
     }
+    return 1;
 }
 let off = [];
 const cheatOff = () => {
