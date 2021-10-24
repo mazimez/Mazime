@@ -356,6 +356,9 @@ Events.on(engine, 'collisionStart', event => {
             if (cellsHorizontal >= 20 || cellsVertical >= 20) {
                 document.querySelector("#next").remove();
             }
+            if (is_autoplay_on) {
+                autoplayOff();
+            }
             document.querySelector('.winner').classList.remove('hidden');
             document.addEventListener('keypress', enterEvent);
             // world.gravity.y = 1;
@@ -492,6 +495,27 @@ const cheatOn = () => {
         .map(() => Array(cellsHorizontal - 1).fill(true));
     solve(getRow(ball), getColumn(ball));
     createLine();
+}
+let is_autoplay_done = 0;
+let is_autoplay_on = 0;
+let auto_play_id;
+const autoplayOn = () => {
+    is_autoplay_on = 1;
+    document.querySelector('#autoplayon').classList.add('hidden');
+    document.querySelector('#autoplayoff').classList.remove('hidden');
+
+    is_autoplay_done = 0;
+    auto_play_id = setInterval(function () {
+        autoPlay();
+    }, 1);
+}
+const autoplayOff = () => {
+    document.querySelector('#autoplayoff').classList.add('hidden');
+    document.querySelector('#autoplayon').classList.remove('hidden');
+    if (is_autoplay_on) {
+        is_autoplay_on = 0;
+        clearInterval(auto_play_id);
+    }
 }
 const createLine = () => {
     lHorizontals.forEach((row, rowIndex) => {
@@ -659,3 +683,211 @@ const cheatOff = () => {
 }
 
 
+//function to autocomplete the game
+const autoPlay = () => {
+    is_autoplay_done = 0;
+    autoPlayVisitedGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    autoPlayPathGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+    autoSolve(getRow(ball), getColumn(ball));
+    autoPlayPathGrid[getRow(ball)][getColumn(ball)] = true;
+
+    autoMoveObject(ball, autoPlayPathGrid, [cellsHorizontal - 1, cellsVertical - 1]);
+}
+const autoSolve = (row, column) => {
+
+    //check if node we are on is already in array path or we reach to goal
+    if (autoPlayVisitedGrid[cellsHorizontal - 1][cellsVertical - 1]) {
+        if (!is_autoplay_done) {
+            is_autoplay_done = 1;
+            return 0;
+        }
+        return 0;
+    }
+    if (autoPlayVisitedGrid[row][column]) {
+        return 0;
+    }
+    //making node visited to puch in array soon
+    autoPlayVisitedGrid[row][column] = true;
+
+
+    //assemble list of neighbour
+    const neighbors = shuffle([
+        [row - 1, column, 'up'],
+        [row, column + 1, 'right'],
+        [row + 1, column, 'down'],
+        [row, column - 1, 'left']
+    ]);
+
+    //for each neighbour
+    for (let neighbor of neighbors) {
+        //see if neigbour is out of bounds
+        const [nextRow, nextColumn, direction] = neighbor;
+        if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
+            continue;
+        }
+
+        //if we visited neigbour, contunie checking
+        if (autoPlayVisitedGrid[nextRow][nextColumn]) {
+            continue;
+        }
+
+        //chek if there is wall between 2 node
+        if (direction === 'up') {
+            if (horizontals[row - 1][column]) {
+                autoPlayPathGrid[row - 1][column] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'down') {
+            if (horizontals[row][column]) {
+                autoPlayPathGrid[row + 1][column] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'left') {
+            if (verticals[row][column - 1]) {
+                autoPlayPathGrid[row][column - 1] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'right') {
+            if (verticals[row][column]) {
+                autoPlayPathGrid[row][column + 1] = true;
+            } else {
+                continue;
+            }
+        }
+        should_stay = autoSolve(nextRow, nextColumn);
+        if (autoPlayPathGrid[cellsHorizontal - 1][cellsVertical - 1] && should_stay) {
+
+        } else {
+            if (direction === 'up') {
+                if (horizontals[row - 1][column]) {
+                    autoPlayPathGrid[row - 1][column] = false;
+                }
+            }
+            if (direction === 'down') {
+                if (horizontals[row][column]) {
+                    autoPlayPathGrid[row + 1][column] = false;
+                }
+            }
+            if (direction === 'left') {
+                if (verticals[row][column - 1]) {
+                    autoPlayPathGrid[row][column - 1] = false;
+                }
+            }
+            if (direction === 'right') {
+                if (verticals[row][column]) {
+                    autoPlayPathGrid[row][column + 1] = false;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+const autoMoveObject = (object, pathGrid, target) => {
+    objectVisitedGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+    let targetRow = target[0];
+    let targetColumn = target[1];
+    let row, column;
+    let is_target_reached = 0;
+    let neighbors;
+    let interval = 0;
+    while (!is_target_reached && interval < 10) {
+        let { x, y } = object.velocity;
+        row = getRow(object);
+        column = getColumn(object);
+        objectVisitedGrid[row, column] = true;
+
+        //assemble list of neighbour
+        neighbors = shuffle([
+            [row - 1, column, 'up'],
+            [row, column + 1, 'right'],
+            [row + 1, column, 'down'],
+            [row, column - 1, 'left']
+        ]);
+
+        //for each neighbour
+        for (let neighbor of neighbors) {
+            interval++;
+            //see if neigbour is out of bounds
+            const [nextRow, nextColumn, direction] = neighbor;
+            if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
+                continue;
+            }
+
+            //if we visited neigbour, contunie checking
+            if (objectVisitedGrid[nextRow][nextColumn]) {
+                continue;
+            }
+
+            //check in path grid that should we go to that neighbor
+            if (!pathGrid[nextRow][nextColumn]) {
+                continue;
+            }
+
+            //check if there is wall between 2 node
+            if (direction === 'up') {
+                if (horizontals[row - 1][column]) {
+                    if (y < -speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(ball, { x, y: y - 3 });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'down') {
+                if (horizontals[row][column]) {
+                    if (y > speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(ball, { x, y: y + 3 });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'left') {
+                if (verticals[row][column - 1]) {
+                    if (x < -speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(ball, { x: x - 3, y });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'right') {
+                if (verticals[row][column]) {
+                    if (x > speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(ball, { x: x + 3, y });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            row = getRow(object);
+            column = getColumn(object);
+            if (row == targetRow && column == targetColumn) {
+                is_target_reached = 1;
+            }
+        }
+    }
+
+}

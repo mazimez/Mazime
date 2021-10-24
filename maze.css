@@ -34,3 +34,11 @@ h1{
     right:10px;
     z-index: 1;
 }
+.autoplay{
+    display: grid;
+    place-items: center;
+    position: absolute;
+    bottom:10px;    
+    left:10px;
+    z-index: 1;
+}
