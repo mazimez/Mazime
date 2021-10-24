@@ -506,7 +506,7 @@ const autoplayOn = () => {
     document.querySelector('#autoplayon').classList.add('hidden');
     document.querySelector('#autoplayoff').classList.remove('hidden');
 
-    let timer = is_in_phone_mode ? 200 : 1;
+    let timer = is_in_phone_mode ? 100 : 1;
     is_autoplay_done = 0;
     auto_play_id = setInterval(function () {
         autoPlay();
