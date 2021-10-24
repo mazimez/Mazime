@@ -11,6 +11,7 @@ let speedlimit = 15; //speedlimit of ball
 let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
 let level = 1 //the current level
+let is_in_phone_mode = 0;
 
 const engine = Engine.create(); //creating the engine for all the matter to work
 engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
@@ -261,6 +262,7 @@ var h = window.innerHeight;
 
 if (w <= 500 && h <= 800) {
     console.log("phone mode is on");
+    is_in_phone_mode = 1;
     let acl = new Accelerometer({ frequency: 60 });
     acl.start();
     let p = document.getElementById('test');
@@ -504,10 +506,11 @@ const autoplayOn = () => {
     document.querySelector('#autoplayon').classList.add('hidden');
     document.querySelector('#autoplayoff').classList.remove('hidden');
 
+    let timer = is_in_phone_mode ? 200 : 1;
     is_autoplay_done = 0;
     auto_play_id = setInterval(function () {
         autoPlay();
-    }, 1);
+    }, timer);
 }
 const autoplayOff = () => {
     document.querySelector('#autoplayoff').classList.add('hidden');
