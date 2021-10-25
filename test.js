@@ -4,9 +4,9 @@ const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
 const width = window.innerWidth - 5; //the actual width of the part where matter will render it's engine
 const height = window.innerHeight - 5; //the actual height of the part where matter will render it's engine
-let cellsWidth = 10;  //the thickness of the lines
+let cellsWidth = 5;  //the thickness of the lines
 let cellsHorizontal = 5; //amount of columns at start
-let cellsVertical = 5; //amount of rows at start
+let cellsVertical = 10; //amount of rows at start
 let speedlimit = 15; //speedlimit of ball
 let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
@@ -271,6 +271,44 @@ let ghost = Bodies.circle(
 );
 World.add(world, ghost); //adding the ghost to the world
 
+let ghost_play_id;
+let is_ghost_play_done = 0;
+const startGhost = () => {
+    setTimeout(function () { }, 3000);
+    let ghostTimer = 400;
+    is_ghost_play_done = 0;
+    ghost_play_id = setInterval(function () {
+        ghostOn();
+    }, ghostTimer);
+}
+
+//ghost autoplay
+const ghostOn = () => {
+    is_ghost_play_done = 0;
+    ghostPlayVisitedGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    ghostPlayPathGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+    autoSolve(
+        getRow(ghost),
+        getColumn(ghost),
+        getRow(ball),
+        getColumn(ball),
+        ghostPlayVisitedGrid,
+        ghostPlayPathGrid,
+        is_ghost_play_done,
+    );
+    ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
+    // console.log(ghostPlayPathGrid);
+
+    autoMoveObject(ghost, ghostPlayPathGrid, [getRow(ball), getColumn(ball)]);
+}
+
+
+
 //ball controls (for phone and PC)
 var w = window.innerWidth;
 var h = window.innerHeight;
@@ -366,52 +404,24 @@ if (w <= 500 && h <= 800) {
 }
 
 //win condition
-let is_won = false;
-let is_lose = false;
 Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach((collision) => {
-        const win_labels = ['ball', 'goal'];
-        const lose_labels = ['ball', 'ghost'];
-        //win condition
-        if (win_labels.includes(collision.bodyA.label) && win_labels.includes(collision.bodyB.label)) {
-            if (!is_lose) {
-                is_won = true;
-                if (cellsHorizontal >= 20 || cellsVertical >= 20) {
-                    document.querySelector("#next").remove();
-                }
-                if (is_autoplay_on) {
-                    autoplayOff();
-                }
-                ghostplayOff();
-                document.querySelector('.winner').classList.remove('hidden');
-                document.addEventListener('keypress', enterEvent);
-                // world.gravity.y = 1;
-                world.bodies.forEach(body => {
-                    if (body.label === 'wall') {
-                        Body.setStatic(body, false);
-                    }
-                });
+        const labels = ['ball', 'goal'];
+        if (labels.includes(collision.bodyA.label) && labels.includes(collision.bodyB.label)) {
+            if (cellsHorizontal >= 20 || cellsVertical >= 20) {
+                document.querySelector("#next").remove();
             }
-        }
-        if (lose_labels.includes(collision.bodyA.label) && lose_labels.includes(collision.bodyB.label)) {
-
-            console.log(is_won);
-            if (!is_won) {
-                is_lose = true;
-                if (is_autoplay_on) {
-                    autoplayOff();
-                }
-                // ghostplayOff();
-                document.querySelector('.losser').classList.remove('hidden');
-                document.addEventListener('keypress', enterEvent);
-                // world.gravity.y = 1;
-                world.bodies.forEach(body => {
-                    if (body.label === 'wall') {
-                        Body.setStatic(body, false);
-                    }
-                });
+            if (is_autoplay_on) {
+                autoplayOff();
             }
-
+            document.querySelector('.winner').classList.remove('hidden');
+            document.addEventListener('keypress', enterEvent);
+            // world.gravity.y = 1;
+            world.bodies.forEach(body => {
+                if (body.label === 'wall') {
+                    Body.setStatic(body, false);
+                }
+            });
         }
     });
 });
@@ -425,11 +435,8 @@ function enterEvent(event) {
 //next Level
 const nextLevel = () => {
 
-    is_lose = false;
-    is_won = false;
-    ghostplayOff();
     if (level >= 20) {
-        console.log("no more level nor now");
+        console.log("no more level for now");
     } else {
         let out = [];
 
@@ -447,8 +454,8 @@ const nextLevel = () => {
             World.remove(world, body);
         });
         World.remove(world, ball);
-        World.remove(world, goal);
         World.remove(world, ghost);
+        World.remove(world, goal);
 
         cheatOff();
 
@@ -503,7 +510,6 @@ const nextLevel = () => {
             }
         );
         World.add(world, ball);
-
         ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
         ghost = Bodies.circle(
             (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
@@ -517,7 +523,6 @@ const nextLevel = () => {
             }
         );
         World.add(world, ghost);
-
 
         goal = Bodies.rectangle(
             width - (unitLengthX / 2),
@@ -534,7 +539,6 @@ const nextLevel = () => {
         );
         World.add(world, goal);
         level++;
-        ghostPlayOn();
     }
 }
 
@@ -574,37 +578,6 @@ const autoplayOn = () => {
     auto_play_id = setInterval(function () {
         autoPlay();
     }, timer);
-}
-let ghost_play_id;
-const ghostPlayOn = () => {
-    document.querySelector('#ghostplayon').classList.add('hidden');
-    document.querySelector('#ghostplayoff').classList.remove('hidden');
-    World.remove(world, ghost);
-    ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
-    ghost = Bodies.circle(
-        (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
-        unitLengthY / 2,
-        ghostRadius, //radius of the ghost
-        {
-            label: 'ghost', //labeling it as ghost
-            render: {
-                fillStyle: 'red' //giving it color
-            }
-        }
-    );
-    World.add(world, ghost);
-    setTimeout(function () {
-        let ghostTimer = 70;
-        ghost_play_id = setInterval(function () {
-            ghostAutoPlay();
-        }, ghostTimer);
-    }, 3000);
-}
-const ghostplayOff = () => {
-    document.querySelector('#ghostplayoff').classList.add('hidden');
-    document.querySelector('#ghostplayon').classList.remove('hidden');
-    clearInterval(ghost_play_id);
-    World.remove(world, ghost);
 }
 const autoplayOff = () => {
     document.querySelector('#autoplayoff').classList.add('hidden');
@@ -780,28 +753,6 @@ const cheatOff = () => {
 }
 
 
-
-const ghostAutoPlay = () => {
-    ghostPlayVisitedGrid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-
-    ghostPlayPathGrid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-    autoSolve(
-        getRow(ghost),//starting row
-        getColumn(ghost),//starting column
-        getRow(ball), //finishing row
-        getColumn(ball), //finishing columns
-        ghostPlayVisitedGrid,//array to keep track of visited nodes
-        ghostPlayPathGrid,//array to store the final path
-        0,//boll to show is task done
-    );
-    ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
-
-    autoMoveObject(ghost, ghostPlayPathGrid, [getRow(ball), getColumn(ball)]);
-}
 //function to autocomplete the game
 const autoPlay = () => {
     is_autoplay_done = 0;
@@ -822,15 +773,17 @@ const autoPlay = () => {
         is_autoplay_done,//boll to show is task done
     );
     autoPlayPathGrid[getRow(ball)][getColumn(ball)] = true;
-
+    console.log(autoPlayPathGrid);
     autoMoveObject(ball, autoPlayPathGrid, [cellsHorizontal - 1, cellsVertical - 1]);
 }
 const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, is_done) => {
 
+    console.log(is_done);
     //check if node we are on is already in array path or we reach to goal
     if (visitedGrid[finishRow][finishColumn]) {
         if (!is_done) {
             is_done = 1;
+            console.log(is_done);
             return 0;
         }
         return 0;
@@ -922,7 +875,7 @@ const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, 
 }
 
 const autoMoveObject = (object, pathGrid, target) => {
-    objectVisitedGrid = Array(cellsVertical)
+    let objectVisitedGrid = Array(cellsVertical)
         .fill(null)
         .map(() => Array(cellsHorizontal).fill(false));
     let targetRow = target[0];
@@ -1019,7 +972,4 @@ const autoMoveObject = (object, pathGrid, target) => {
 
 }
 
-const restart = () => {
-    window.location.reload();
-}
-ghostPlayOn();
+// startGhost();

@@ -22,8 +22,20 @@ h1{
     height: 100vh;
     width: 100vw;
 }
+.losser{
+    display: grid;
+    place-items: center;
+    position: absolute;
+    z-index: 1;
+    height: 100vh;
+    width: 100vw;
+}
 .winner button{
     background-color: green;
+    font-size: 70px;
+}
+.losser button{
+    background-color: red;
     font-size: 70px;
 }
 .cheat{
@@ -40,5 +52,13 @@ h1{
     position: absolute;
     bottom:10px;    
     left:10px;
+    z-index: 1;
+}
+.ghost{
+    display: grid;
+    place-items: center;
+    position: absolute;
+    bottom:10px;    
+    left:130px;
     z-index: 1;
 }
