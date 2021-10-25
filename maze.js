@@ -12,6 +12,7 @@ let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(s
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
 let level = 1 //the current level
 let is_in_phone_mode = 0;
+let ghost_speed = 30;
 
 const engine = Engine.create(); //creating the engine for all the matter to work
 engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
@@ -468,6 +469,9 @@ const nextLevel = () => {
         } else {
             speedlimit = speedlimit - 1;
         }
+        if (ghost_speed > 5) {
+            ghost_speed = ghost_speed - 5;
+        }
 
         unitLengthX = width / cellsHorizontal;
         unitLengthY = height / cellsVertical;
@@ -594,7 +598,7 @@ const ghostPlayOn = () => {
     );
     World.add(world, ghost);
     setTimeout(function () {
-        let ghostTimer = 70;
+        let ghostTimer = ghost_speed * 10;
         ghost_play_id = setInterval(function () {
             ghostAutoPlay();
         }, ghostTimer);
