@@ -13,6 +13,7 @@ let unitLengthY = height / cellsVertical; //calculating the height of one cell(s
 let level = 1 //the current level
 let is_in_phone_mode = 0;
 let ghost_speed = 30;
+let can_teleport = true;
 
 const engine = Engine.create(); //creating the engine for all the matter to work
 engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
@@ -87,6 +88,32 @@ const getRow = (object) => {
 const getColumn = (object) => {
     return (parseInt(object.position.x / unitLengthX));
 }
+
+//function to set the number of rows that the given object is in
+const setRow = (object, row) => {
+    if (row >= 0 && row < cellsVertical) {
+        Body.setPosition(object, { x: object.position.x, y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
+    } else {
+        throw new Error('out of bound');
+    }
+}
+//function to set the number of columns that the given object is in
+const setColumn = (object, column) => {
+    if (column >= 0 && column < cellsHorizontal) {
+        Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: object.position.y });
+    } else {
+        throw new Error('out of bound');
+    }
+}
+//change position of any object in maze
+const changePosition = (object, row, column) => {
+    if (column >= 0 && column < cellsHorizontal && row >= 0 && row < cellsVertical) {
+        Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
+    } else {
+        throw new Error('out of bound');
+    }
+}
+
 
 
 //function that goes throw each and every cells in maze and also update the arrays
@@ -328,11 +355,13 @@ if (w <= 500 && h <= 800) {
     var keyState = {};
     document.addEventListener('keydown', function (e) {
         keyState[e.key] = true;
+        if (e.code == 'Space') {
+            teleportBall();
+        }
     });
     document.addEventListener('keyup', function (e) {
         keyState[e.key] = false;
     });
-
     setInterval(function () {
         const { x, y } = ball.velocity;
         if (keyState['w'] || keyState['ArrowUp']) {
@@ -1026,4 +1055,15 @@ const autoMoveObject = (object, pathGrid, target) => {
 const restart = () => {
     window.location.reload();
 }
+function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+const teleportBall = () => {
+    row = randomIntFromInterval(0, cellsVertical - 1);
+    column = randomIntFromInterval(0, cellsHorizontal - 1);
+    var audio = new Audio("teleportation.mp3");
+    audio.play();
+    changePosition(ball, row, column);
+}
+
 ghostPlayOn();
