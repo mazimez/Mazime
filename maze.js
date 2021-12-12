@@ -12,9 +12,13 @@ let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(s
 let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
 let level = 1 //the current level
 let is_in_phone_mode = 0;
-let ghost_speed = 30;
+let ghost_speed = 50;
 let can_teleport = true;
 
+let url = window.location.href;
+let params = (new URL(url).searchParams);
+let character = params.get('character');
+console.log(character);
 const engine = Engine.create(); //creating the engine for all the matter to work
 engine.world.gravity.y = 0; //setting the gravity to 0 so everything doesn't fall down
 const { world } = engine; //getting the world variable from the engine
@@ -356,7 +360,7 @@ if (w <= 500 && h <= 800) {
     document.addEventListener('keydown', function (e) {
         keyState[e.key] = true;
         if (e.code == 'Space') {
-            teleportBall();
+            specialAbility();;
         }
     });
     document.addEventListener('keyup', function (e) {
@@ -499,7 +503,7 @@ const nextLevel = () => {
             speedlimit = speedlimit - 1;
         }
         if (ghost_speed > 5) {
-            ghost_speed = ghost_speed - 5;
+            ghost_speed = ghost_speed - 2;
         }
 
         unitLengthX = width / cellsHorizontal;
@@ -1065,5 +1069,23 @@ const teleportBall = () => {
     audio.play();
     changePosition(ball, row, column);
 }
+const specialAbility = () => {
+    switch (character) {
+        case 'sasuke':
+            teleportBall();
+            break;
+        case 'neji':
+            // var audio = loadSound("byakugan.mp3");
+            var audio = new Audio("byakugan.mp3");
+            audio.play();
+            cheatOn();
+            break;
+        case 'rock_lee':
+            autoplayOn();
+            break;
 
+        default:
+            break;
+    }
+}
 ghostPlayOn();
