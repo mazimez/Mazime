@@ -271,7 +271,7 @@ const addControlsToBall = () => {
         document.addEventListener('keydown', function (e) {
             keyState[e.key] = true;
             if (e.code == 'Space') {
-                teleportBall();
+                specialAbility();
             }
         });
         document.addEventListener('keyup', function (e) {

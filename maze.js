@@ -21,8 +21,8 @@ let lHorizontals;
 let is_win = 0;
 
 const cheatOn = () => {
-    document.querySelector('#cheaton').classList.add('hidden');
-    document.querySelector('#cheatoff').classList.remove('hidden');
+    // document.querySelector('#cheaton').classList.add('hidden');
+    // document.querySelector('#cheatoff').classList.remove('hidden');
 
     is_win = 0;
     cheatGrid = Array(cellsVertical)
@@ -42,8 +42,8 @@ let is_autoplay_on = 0;
 let auto_play_id;
 const autoplayOn = () => {
     is_autoplay_on = 1;
-    document.querySelector('#autoplayon').classList.add('hidden');
-    document.querySelector('#autoplayoff').classList.remove('hidden');
+    // document.querySelector('#autoplayon').classList.add('hidden');
+    // document.querySelector('#autoplayoff').classList.remove('hidden');
 
     let timer = is_in_phone_mode ? 100 : 1;
     is_autoplay_done = 0;
@@ -83,8 +83,8 @@ const ghostplayOff = () => {
     World.remove(world, ghost);
 }
 const autoplayOff = () => {
-    document.querySelector('#autoplayoff').classList.add('hidden');
-    document.querySelector('#autoplayon').classList.remove('hidden');
+    // document.querySelector('#autoplayoff').classList.add('hidden');
+    // document.querySelector('#autoplayon').classList.remove('hidden');
     if (is_autoplay_on) {
         is_autoplay_on = 0;
         clearInterval(auto_play_id);
@@ -243,8 +243,8 @@ const solve = (row, column) => {
 }
 let off = [];
 const cheatOff = () => {
-    document.querySelector('#cheaton').classList.remove('hidden');
-    document.querySelector('#cheatoff').classList.add('hidden');
+    // document.querySelector('#cheaton').classList.remove('hidden');
+    // document.querySelector('#cheatoff').classList.add('hidden');
     world.bodies.forEach(body => {
         if (body.label === 'line') {
             off.push(body);
@@ -509,14 +509,20 @@ const teleportBall = () => {
     changePosition(ball, row, column);
 }
 const specialAbility = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const character = urlParams.get('character');
+    if (is_won) {
+        return 0;
+    }
+
     switch (character) {
         case 'sasuke':
             teleportBall();
             break;
         case 'neji':
             // var audio = loadSound("byakugan.mp3");
-            var audio = new Audio("byakugan.mp3");
-            audio.play();
+            var audio_1 = new Audio("byakugan.mp3");
+            audio_1.play();
             cheatOn();
             break;
         case 'rock_lee':
