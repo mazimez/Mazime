@@ -508,6 +508,19 @@ const teleportBall = () => {
     audio.play();
     changePosition(ball, row, column);
 }
+const kamui = () => {
+    ball.render.fillStyle = 'white';
+    ball.collisionFilter = {
+        'category': 2,
+        'mask': 2,
+    };
+    setTimeout(function () {
+        console.log('called');
+        ball.render.fillStyle = 'blue';
+        ball.collisionFilter.category = 1;
+        ball.collisionFilter.mask = -1;
+    }, 500);
+}
 const specialAbility = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const character = urlParams.get('character');
@@ -527,6 +540,9 @@ const specialAbility = () => {
             break;
         case 'rock_lee':
             autoplayOn();
+            break;
+        case 'obito':
+            kamui();
             break;
 
         default:

@@ -14,10 +14,34 @@ let is_in_phone_mode = 0;
 //     "any other options you want to add"
 // ),
 const walls = [
-    Bodies.rectangle(width / 2, 0, width, 10, { isStatic: true }), //upper wall
-    Bodies.rectangle(width / 2, height, width, 10, { isStatic: true }), //lower wall
-    Bodies.rectangle(0, height / 2, 10, height, { isStatic: true }), //wall at left side
-    Bodies.rectangle(width, height / 2, 10, height, { isStatic: true }), //wall at right side
+    Bodies.rectangle(width / 2, 0, width, 10, {
+        isStatic: true,
+        collisionFilter: {
+            category: -1,
+            mask: -1,
+        }
+    }), //upper wall
+    Bodies.rectangle(width / 2, height, width, 10, {
+        isStatic: true,
+        collisionFilter: {
+            category: -1,
+            mask: -1,
+        }
+    }), //lower wall
+    Bodies.rectangle(0, height / 2, 10, height, {
+        isStatic: true,
+        collisionFilter: {
+            category: -1,
+            mask: -1,
+        }
+    }), //wall at left side
+    Bodies.rectangle(width, height / 2, 10, height, {
+        isStatic: true,
+        collisionFilter: {
+            category: -1,
+            mask: -1,
+        }
+    }), //wall at right side
 ];
 World.add(world, walls); //adding the wall array to world so it shows on HTML file
 
