@@ -549,4 +549,24 @@ const specialAbility = () => {
             break;
     }
 }
+let special_ability_count_left = 3;
+let special_ability_wait_time = 2000;
+let is_special_ability_in_use = 0;
+const useSpecialAbility = () => {
+    if (special_ability_count_left <= 0) {
+        document.querySelector('#special').classList.add('hidden');
+        return 0;
+    }
+    if (!is_special_ability_in_use) {
+        document.querySelector('#special').classList.add('hidden');
+        special_ability_count_left = special_ability_count_left - 1;
+        is_special_ability_in_use = 1;
+        specialAbility();
+        setTimeout(function () {
+            document.querySelector('#special').classList.remove('hidden');
+            is_special_ability_in_use = 0;
+        }, special_ability_wait_time);
+    }
+
+}
 ghostPlayOn();
