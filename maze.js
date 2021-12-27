@@ -3,6 +3,18 @@ let level = 1 //the current level
 let ghost_speed = 30;
 let can_teleport = true;
 
+//creating the render object on the body tag of HTML file with dimensions
+render = Render.create({
+    element: document.body,
+    engine: engine,
+    options: {
+        wireframes: false,
+        width,
+        height
+    }
+});
+Render.run(render); //start the rendering to show the world in HTML file
+Runner.run(Runner.create(), engine); //attaching the engine with rendered world
 //starting the maze generation algorithm by calling this function
 stepThroughCell(startRow, startColumn);
 

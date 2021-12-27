@@ -9,14 +9,4 @@ const width = window.innerWidth - 5; //the actual width of the part where matter
 const height = window.innerHeight - 5; //the actual height of the part where matter will render it's engine
 
 //creating the render object on the body tag of HTML file with dimensions
-const render = Render.create({
-    element: document.body,
-    engine: engine,
-    options: {
-        wireframes: false,
-        width,
-        height
-    }
-});
-Render.run(render); //start the rendering to show the world in HTML file
-Runner.run(Runner.create(), engine); //attaching the engine with rendered world
+let render = null;
