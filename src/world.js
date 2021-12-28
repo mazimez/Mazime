@@ -236,9 +236,9 @@ let ghost = Bodies.circle(
     }
 );
 
-//function to add the controls on the ball
-const addControlsToBall = () => {
-    //ball controls (for phone and PC)
+//function to add the controls on the object
+const addControlsToObject = (object) => {
+    //object controls (for phone and PC)
     var w = window.innerWidth;
     var h = window.innerHeight;
 
@@ -247,11 +247,8 @@ const addControlsToBall = () => {
         is_in_phone_mode = 1;
         let acl = new Accelerometer({ frequency: 60 });
         acl.start();
-        let p = document.getElementById('test');
         setInterval(function () {
-            // console.log("Acceleration along the X-axis " + acl.x);
-            // p.innerHTML = "the x is " + acl.x + "<br>" + "the y is " + acl.y + "<br>" + "the z is " + acl.z;
-            const { x, y } = ball.velocity;
+            const { x, y } = object.velocity;
             let speedx = Math.ceil(acl.x);
             let speedy = Math.ceil(acl.y);
             let rate = 0.7;
@@ -260,7 +257,7 @@ const addControlsToBall = () => {
                 if (y < -speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x, y: y - (Math.abs(speedy) * rate) });
+                    Body.setVelocity(object, { x, y: y - (Math.abs(speedy) * rate) });
                 }
             }
             //down
@@ -268,7 +265,7 @@ const addControlsToBall = () => {
                 if (y > speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x, y: y + (Math.abs(speedy) * rate) });
+                    Body.setVelocity(object, { x, y: y + (Math.abs(speedy) * rate) });
                 }
             }
             //left
@@ -276,7 +273,7 @@ const addControlsToBall = () => {
                 if (x < -speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x: x - (Math.abs(speedx) * rate), y });
+                    Body.setVelocity(object, { x: x - (Math.abs(speedx) * rate), y });
                 }
             }
             //right
@@ -284,7 +281,7 @@ const addControlsToBall = () => {
                 if (x > speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x: x + (Math.abs(speedx) * rate), y });
+                    Body.setVelocity(object, { x: x + (Math.abs(speedx) * rate), y });
                 }
             }
 
@@ -302,33 +299,33 @@ const addControlsToBall = () => {
             keyState[e.key] = false;
         });
         setInterval(function () {
-            const { x, y } = ball.velocity;
+            const { x, y } = object.velocity;
             if (keyState['w'] || keyState['ArrowUp']) {
                 if (y < -speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x, y: y - 3 });
+                    Body.setVelocity(object, { x, y: y - 3 });
                 }
             }
             if (keyState['s'] || keyState['ArrowDown']) {
                 if (y > speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x, y: y + 3 });
+                    Body.setVelocity(object, { x, y: y + 3 });
                 }
             }
             if (keyState['a'] || keyState['ArrowLeft']) {
                 if (x < -speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x: x - 3, y });
+                    Body.setVelocity(object, { x: x - 3, y });
                 }
             }
             if (keyState['d'] || keyState['ArrowRight']) {
                 if (x > speedlimit) {
                     //
                 } else {
-                    Body.setVelocity(ball, { x: x + 3, y });
+                    Body.setVelocity(object, { x: x + 3, y });
                 }
             }
         }, 100);

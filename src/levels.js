@@ -69,7 +69,7 @@ const nextLevel = () => {
         startColumn = Math.floor(Math.random() * cellsHorizontal)
 
         stepThroughCell(startRow, startColumn);
-        createMaze();
+        createMaze();        
 
         ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
         ball = Bodies.circle(
@@ -115,6 +115,7 @@ const nextLevel = () => {
         );
         World.add(world, goal);
         level++;
+        addControlsToObject(ball);  
         ghostPlayOn();
     }
 }

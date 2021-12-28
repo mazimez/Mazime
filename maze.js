@@ -24,7 +24,7 @@ createMaze();
 World.add(world, goal); //adding the goal to the world
 World.add(world, ball); //adding the ball to the world
 World.add(world, ghost); //adding the ghost to the world
-addControlsToBall();//adding the controls on ball
+addControlsToObject(ball);//adding the controls on ball
 
 let cheatGrid;
 let lVerticals;
@@ -527,7 +527,6 @@ const kamui = () => {
         'mask': 2,
     };
     setTimeout(function () {
-        console.log('called');
         ball.render.fillStyle = 'blue';
         ball.collisionFilter.category = 1;
         ball.collisionFilter.mask = -1;
