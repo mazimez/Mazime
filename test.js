@@ -9,6 +9,11 @@ let speedlimit = 15; //speedlimit of ball
 let level = 1 //the current level
 let ghost_speed = 30;
 let can_teleport = true;
+let width_ratio = null;
+let height_ratio = null;
+let is_autoplay_done = 0;
+let is_autoplay_on = 0;
+let auto_play_id;
  peer.on('open', function (id) {
     peer_id = id; //assigning value to peer id
     console.log("my peer id: "+peer_id);
@@ -39,7 +44,9 @@ let can_teleport = true;
         Runner.run(Runner.create(), engine); //attaching the engine with rendered world
 
         conn.send({
-           "peer_id":peer_id
+           "peer_id":peer_id,
+           "width":window.innerWidth,
+           "height":window.innerHeight,
         });
     });
 }
@@ -62,6 +69,18 @@ const receiveMessage = (data) =>{
     }
     if(data.peer_id){   
         another_peer_id = data.peer_id; 
+    }
+    if(data.width){   
+        width_ratio = window.innerWidth/data.width;
+    }
+    if(data.height){   
+        height_ratio = window.innerHeight/data.height;
+    }
+    if(data.width_ratio){   
+        width_ratio = data.width_ratio;
+    }
+    if(data.height_ratio){   
+        height_ratio = data.height_ratio;
     }
     if(!is_connected && another_peer_id){
         document.getElementById('peer_key').remove();
@@ -87,6 +106,8 @@ const receiveMessage = (data) =>{
             conn.send({
                "verticals":verticals,
                "horizontals":horizontals,
+               "width_ratio":width_ratio,
+               "height_ratio":height_ratio,
             });                    
             createMaze();
             World.add(world, goal); //adding the goal to the world
@@ -115,12 +136,12 @@ const startDataTransfer = () => {
     setInterval(function () {
         conn.send({
             "ball":{
-                "x":ball.position.x,
-                "y":ball.position.y,
+                "x":ball.position.x / width_ratio,
+                "y":ball.position.y / height_ratio,
             },
             "ghost":{
-                "x":ghost.position.x,
-                "y":ghost.position.y,
+                "x":ghost.position.x * width_ratio,
+                "y":ghost.position.y * height_ratio,
             }
          }); 
         // sendMessage({

@@ -349,7 +349,12 @@ Events.on(engine, 'collisionStart', event => {
                 if (is_autoplay_on) {
                     autoplayOff();
                 }
-                ghostplayOff();
+                try{
+                    ghostplayOff();
+                }catch(err){
+
+                }
+                
                 document.querySelector('.winner').classList.remove('hidden');
                 document.addEventListener('keypress', enterEvent);
                 // world.gravity.y = 1;
@@ -361,8 +366,6 @@ Events.on(engine, 'collisionStart', event => {
             }
         }
         if (lose_labels.includes(collision.bodyA.label) && lose_labels.includes(collision.bodyB.label)) {
-
-            console.log(is_won);
             if (!is_won) {
                 is_lose = true;
                 if (is_autoplay_on) {
