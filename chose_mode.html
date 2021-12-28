@@ -169,10 +169,10 @@
                     <img class="img-responsive" src="multiplayer.png" alt="">
                     <div class="overlay">
                         <h2>Multiplayer</h2>
-                        <!-- <h5>Play with friend</h5> -->
-                        <h5>Coming soon</h5>
-                        <!-- <a class="info" onclick="startMultiPlayer()">Start Game</a> -->
-                        <a class="info" href="#">Start Game</a>
+                        <h5>Play with friend</h5>
+                        <!-- <h5>Coming soon</h5> -->
+                        <a class="info" onclick="startMultiPlayer()">Start Game</a>
+                        <!-- <a class="info" href="#">Start Game</a> -->
                     </div>
                 </div>
             </div>            
@@ -194,7 +194,7 @@
     const startMultiPlayer = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const character = urlParams.get('character');
-        let url = "test.html?character="+character;
+        let url = "multiplayer.html?character="+character;
         window.location.replace(url);
     }
 </script>
