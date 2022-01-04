@@ -1,4 +1,4 @@
-let cellsWidth = 10;  //the thickness of the lines
+let cellsWidth = 10; //the thickness of the lines
 let cellsHorizontal = 5; //amount of columns at start
 let cellsVertical = 5; //amount of rows at start
 let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
@@ -105,7 +105,7 @@ const stepThroughCell = (row, column) => {
             if cells not out of bound and not visited, 
             then we can remove the wall/block/rectangle between that 2 cells
             */
-            if (direction === 'left') {  //checking the direction to make sure which wall to remove
+            if (direction === 'left') { //checking the direction to make sure which wall to remove
                 verticals[row][column - 1] = true;
             } else if (direction === 'right') {
                 verticals[row][column] = true;
@@ -130,7 +130,7 @@ const createMaze = () => {
     going throw horizontal array to put 
     block/wall/rectangle according to array's data
     */
-    horizontals.forEach((row, rowIndex,) => {
+    horizontals.forEach((row, rowIndex, ) => {
         row.forEach((open, columnIndex) => {
             /*
             if the array's value is true, that means there are no wall at that point
@@ -149,10 +149,10 @@ const createMaze = () => {
                     unitLengthX + 10, //width of that rectangle will be unit lenght of x(because it's horizontal)
                     cellsWidth, //height(thickness) of that rectangle 
                     {
-                        label: 'wall',  //labeling the rectangle as wall
+                        label: 'wall', //labeling the rectangle as wall
                         isStatic: true, //making the wall static so it does't get effected by gravity
                         render: {
-                            fillStyle: 'white'  //giving the color to wall
+                            fillStyle: 'white' //giving the color to wall
                         }
                     }
                 );
@@ -247,7 +247,7 @@ const addControlsToObject = (object) => {
         is_in_phone_mode = 1;
         let acl = new Accelerometer({ frequency: 60 });
         acl.start();
-        setInterval(function () {
+        setInterval(function() {
             const { x, y } = object.velocity;
             let speedx = Math.ceil(acl.x);
             let speedy = Math.ceil(acl.y);
@@ -289,16 +289,16 @@ const addControlsToObject = (object) => {
     } else {
         console.log("PC mode is on");
         var keyState = {};
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             keyState[e.key] = true;
             if (e.code == 'Space') {
                 specialAbility();
             }
         });
-        document.addEventListener('keyup', function (e) {
+        document.addEventListener('keyup', function(e) {
             keyState[e.key] = false;
         });
-        setInterval(function () {
+        setInterval(function() {
             const { x, y } = object.velocity;
             if (keyState['w'] || keyState['ArrowUp']) {
                 if (y < -speedlimit) {
@@ -335,56 +335,21 @@ const addControlsToObject = (object) => {
 //collision condition
 let is_won = false;
 let is_lose = false;
+let ball_goal_collision_evt = new CustomEvent("ball_goal_collision");
+let ball_ghost_collision_evt = new CustomEvent("ball_ghost_collision");
 Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach((collision) => {
-        const win_labels = ['ball', 'goal'];
-        const lose_labels = ['ball', 'ghost'];
-        //win condition
-        if (win_labels.includes(collision.bodyA.label) && win_labels.includes(collision.bodyB.label)) {
-            if (!is_lose) {
-                is_won = true;
-                if (cellsHorizontal >= 20 || cellsVertical >= 20) {
-                    document.querySelector("#next").remove();
-                }
-                if (is_autoplay_on) {
-                    autoplayOff();
-                }
-                try{
-                    ghostplayOff();
-                }catch(err){
-
-                }
-                
-                document.querySelector('.winner').classList.remove('hidden');
-                document.addEventListener('keypress', enterEvent);
-                // world.gravity.y = 1;
-                world.bodies.forEach(body => {
-                    if (body.label === 'wall') {
-                        Body.setStatic(body, false);
-                    }
-                });
-            }
+        const ball_goal_labels = ['ball', 'goal'];
+        const ball_ghost_labels = ['ball', 'ghost'];
+        if (ball_goal_labels.includes(collision.bodyA.label) && ball_goal_labels.includes(collision.bodyB.label)) {
+            window.dispatchEvent(ball_goal_collision_evt);
         }
-        if (lose_labels.includes(collision.bodyA.label) && lose_labels.includes(collision.bodyB.label)) {
-            if (!is_won) {
-                is_lose = true;
-                if (is_autoplay_on) {
-                    autoplayOff();
-                }
-                // ghostplayOff();
-                document.querySelector('.losser').classList.remove('hidden');
-                document.addEventListener('keypress', enterEvent);
-                // world.gravity.y = 1;
-                world.bodies.forEach(body => {
-                    if (body.label === 'wall') {
-                        Body.setStatic(body, false);
-                    }
-                });
-            }
-
+        if (ball_ghost_labels.includes(collision.bodyA.label) && ball_ghost_labels.includes(collision.bodyB.label)) {
+            window.dispatchEvent(ball_ghost_collision_evt)
         }
     });
 });
+
 function enterEvent(event) {
     if (['Enter', ' '].includes(event.key)) {
         document.removeEventListener('keypress', enterEvent);
@@ -396,29 +361,29 @@ function enterEvent(event) {
 /*useful methods*/
 //function to get the number of rows that the given object is in
 const getRow = (object) => {
-    return (parseInt(object.position.y / unitLengthY));
-}
-//function to get the number of columns that the given object is in
+        return (parseInt(object.position.y / unitLengthY));
+    }
+    //function to get the number of columns that the given object is in
 const getColumn = (object) => {
-    return (parseInt(object.position.x / unitLengthX));
-}
-//function to set the number of rows that the given object is in
+        return (parseInt(object.position.x / unitLengthX));
+    }
+    //function to set the number of rows that the given object is in
 const setRow = (object, row) => {
-    if (row >= 0 && row < cellsVertical) {
-        Body.setPosition(object, { x: object.position.x, y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
-    } else {
-        throw new Error('out of bound');
+        if (row >= 0 && row < cellsVertical) {
+            Body.setPosition(object, { x: object.position.x, y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
+        } else {
+            throw new Error('out of bound');
+        }
     }
-}
-//function to set the number of columns that the given object is in
+    //function to set the number of columns that the given object is in
 const setColumn = (object, column) => {
-    if (column >= 0 && column < cellsHorizontal) {
-        Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: object.position.y });
-    } else {
-        throw new Error('out of bound');
+        if (column >= 0 && column < cellsHorizontal) {
+            Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: object.position.y });
+        } else {
+            throw new Error('out of bound');
+        }
     }
-}
-//change position of any object in maze
+    //change position of any object in maze
 const changePosition = (object, row, column) => {
     if (column >= 0 && column < cellsHorizontal && row >= 0 && row < cellsVertical) {
         Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });

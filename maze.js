@@ -3,6 +3,52 @@ let level = 1 //the current level
 let ghost_speed = 30;
 let can_teleport = true;
 
+//adding events listeners for collision
+window.addEventListener("ball_goal_collision", function(evt) {
+    if (!is_lose) {
+        is_won = true;
+        if (cellsHorizontal >= 20 || cellsVertical >= 20) {
+            document.querySelector("#next").remove();
+        }
+        if (is_autoplay_on) {
+            autoplayOff();
+        }
+        try {
+            ghostplayOff();
+        } catch (err) {
+
+        }
+
+        document.querySelector('.winner').classList.remove('hidden');
+        document.addEventListener('keypress', enterEvent);
+        // world.gravity.y = 1;
+        world.bodies.forEach(body => {
+            if (body.label === 'wall') {
+                Body.setStatic(body, false);
+            }
+        });
+    }
+}, false);
+
+window.addEventListener("ball_ghost_collision", function(evt) {
+    if (!is_won) {
+        is_lose = true;
+        if (is_autoplay_on) {
+            autoplayOff();
+        }
+        // ghostplayOff();
+        document.querySelector('.losser').classList.remove('hidden');
+        document.addEventListener('keypress', enterEvent);
+        // world.gravity.y = 1;
+        world.bodies.forEach(body => {
+            if (body.label === 'wall') {
+                Body.setStatic(body, false);
+            }
+        });
+    }
+}, false);
+
+
 //creating the render object on the body tag of HTML file with dimensions
 render = Render.create({
     element: document.body,
@@ -24,7 +70,7 @@ createMaze();
 World.add(world, goal); //adding the goal to the world
 World.add(world, ball); //adding the ball to the world
 World.add(world, ghost); //adding the ghost to the world
-addControlsToObject(ball);//adding the controls on ball
+addControlsToObject(ball); //adding the controls on ball
 
 let cheatGrid;
 let lVerticals;
@@ -59,7 +105,7 @@ const autoplayOn = () => {
 
     let timer = is_in_phone_mode ? 100 : 1;
     is_autoplay_done = 0;
-    auto_play_id = setInterval(function () {
+    auto_play_id = setInterval(function() {
         autoPlay();
     }, timer);
 }
@@ -81,9 +127,9 @@ const ghostPlayOn = () => {
         }
     );
     World.add(world, ghost);
-    setTimeout(function () {
+    setTimeout(function() {
         let ghostTimer = ghost_speed * 10;
-        ghost_play_id = setInterval(function () {
+        ghost_play_id = setInterval(function() {
             ghostAutoPlay();
         }, ghostTimer);
     }, 3000);
@@ -112,8 +158,7 @@ const createLine = () => {
                 columnIndex * unitLengthX + unitLengthX,
                 rowIndex * unitLengthY + (unitLengthY / 2),
                 unitLengthX,
-                3,
-                {
+                3, {
                     label: 'line',
                     isStatic: true,
                     render: {
@@ -139,8 +184,7 @@ const createLine = () => {
                 columnIndex * unitLengthX + (unitLengthX / 2),
                 rowIndex * unitLengthY + unitLengthY,
                 3,
-                unitLengthY,
-                {
+                unitLengthY, {
                     label: 'line',
                     isStatic: true,
                     render: {
@@ -270,27 +314,27 @@ const cheatOff = () => {
 
 
 const ghostAutoPlay = () => {
-    ghostPlayVisitedGrid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
+        ghostPlayVisitedGrid = Array(cellsVertical)
+            .fill(null)
+            .map(() => Array(cellsHorizontal).fill(false));
 
-    ghostPlayPathGrid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-    autoSolve(
-        getRow(ghost),//starting row
-        getColumn(ghost),//starting column
-        getRow(ball), //finishing row
-        getColumn(ball), //finishing columns
-        ghostPlayVisitedGrid,//array to keep track of visited nodes
-        ghostPlayPathGrid,//array to store the final path
-        0,//boll to show is task done
-    );
-    ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
+        ghostPlayPathGrid = Array(cellsVertical)
+            .fill(null)
+            .map(() => Array(cellsHorizontal).fill(false));
+        autoSolve(
+            getRow(ghost), //starting row
+            getColumn(ghost), //starting column
+            getRow(ball), //finishing row
+            getColumn(ball), //finishing columns
+            ghostPlayVisitedGrid, //array to keep track of visited nodes
+            ghostPlayPathGrid, //array to store the final path
+            0, //boll to show is task done
+        );
+        ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
 
-    autoMoveObject(ghost, ghostPlayPathGrid, [getRow(ball), getColumn(ball)]);
-}
-//function to autocomplete the game
+        autoMoveObject(ghost, ghostPlayPathGrid, [getRow(ball), getColumn(ball)]);
+    }
+    //function to autocomplete the game
 const autoPlay = () => {
     is_autoplay_done = 0;
     autoPlayVisitedGrid = Array(cellsVertical)
@@ -301,13 +345,13 @@ const autoPlay = () => {
         .fill(null)
         .map(() => Array(cellsHorizontal).fill(false));
     autoSolve(
-        getRow(ball),//starting row
-        getColumn(ball),//starting column
+        getRow(ball), //starting row
+        getColumn(ball), //starting column
         cellsHorizontal - 1, //finishing row
         cellsVertical - 1, //finishing columns
-        autoPlayVisitedGrid,//array to keep track of visited nodes
-        autoPlayPathGrid,//array to store the final path
-        is_autoplay_done,//boll to show is task done
+        autoPlayVisitedGrid, //array to keep track of visited nodes
+        autoPlayPathGrid, //array to store the final path
+        is_autoplay_done, //boll to show is task done
     );
     autoPlayPathGrid[getRow(ball)][getColumn(ball)] = true;
 
@@ -510,6 +554,7 @@ const autoMoveObject = (object, pathGrid, target) => {
 const restart = () => {
     window.location.reload();
 }
+
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
@@ -526,7 +571,7 @@ const kamui = () => {
         'category': 2,
         'mask': 2,
     };
-    setTimeout(function () {
+    setTimeout(function() {
         ball.render.fillStyle = 'blue';
         ball.collisionFilter.category = 1;
         ball.collisionFilter.mask = -1;
@@ -573,7 +618,7 @@ const useSpecialAbility = () => {
         special_ability_count_left = special_ability_count_left - 1;
         is_special_ability_in_use = 1;
         specialAbility();
-        setTimeout(function () {
+        setTimeout(function() {
             document.querySelector('#special').classList.remove('hidden');
             is_special_ability_in_use = 0;
         }, special_ability_wait_time);
