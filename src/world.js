@@ -391,3 +391,29 @@ const changePosition = (object, row, column) => {
         throw new Error('out of bound');
     }
 }
+
+const teleportObject = (object) => {
+    row = randomIntFromInterval(0, cellsVertical - 1);
+    column = randomIntFromInterval(0, cellsHorizontal - 1);
+    var audio = new Audio("teleportation.mp3");
+    audio.play();
+    changePosition(object, row, column);
+}
+
+let make_object_transparent_evt = new CustomEvent("make_object_transparent");
+let remove_transparency_evt = new CustomEvent("remove_transparency");
+const makeObjectTransparent = (object) => {
+    let color = object.render.fillStyle;
+    object.render.fillStyle = 'white';
+    window.dispatchEvent(make_object_transparent_evt);
+    object.collisionFilter = {
+        'category': 2,
+        'mask': 2,
+    };
+    setTimeout(function() {
+        window.dispatchEvent(remove_transparency_evt);
+        object.render.fillStyle = color;
+        object.collisionFilter.category = 1;
+        object.collisionFilter.mask = -1;
+    }, 500);
+}

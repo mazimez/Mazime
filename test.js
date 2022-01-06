@@ -108,6 +108,21 @@ window.addEventListener("ball_ghost_collision", function(evt) {
 
 }, false);
 
+window.addEventListener("make_object_transparent", function(evt) {
+    conn.send({
+        "make_object_transparent": {
+            "object": whoAmI,
+        },
+    });
+}, false);
+window.addEventListener("remove_transparency", function(evt) {
+    conn.send({
+        "remove_transparency": {
+            "object": whoAmI,
+        },
+    });
+}, false);
+
 
 
 
@@ -165,7 +180,35 @@ const receiveMessage = (data) => {
         Body.setPosition(ghost, { x: data.ghost.x, y: data.ghost.y });
     }
     if (data.peer_id) {
-        another_peer_id = data.peer_id;
+        another_peer_id = data.peer_id
+    }
+    if (data.make_object_transparent) {
+        if (data.make_object_transparent.object == 'ghost') {
+            ghost.render.fillStyle = 'white';
+            ghost.collisionFilter = {
+                'category': 2,
+                'mask': 2,
+            };
+        }
+        if (data.make_object_transparent.object == 'player') {
+            ball.render.fillStyle = 'white';
+            ball.collisionFilter = {
+                'category': 2,
+                'mask': 2,
+            };
+        }
+    }
+    if (data.remove_transparency) {
+        if (data.remove_transparency.object == 'ghost') {
+            ghost.render.fillStyle = 'red';
+            ghost.collisionFilter.category = 1;
+            ghost.collisionFilter.mask = -1;
+        }
+        if (data.remove_transparency.object == 'player') {
+            ball.render.fillStyle = 'blue';
+            ball.collisionFilter.category = 1;
+            ball.collisionFilter.mask = -1;
+        }
     }
     if (data.width) {
         width_ratio = window.innerWidth / data.width;
@@ -179,6 +222,7 @@ const receiveMessage = (data) => {
     if (data.height_ratio) {
         height_ratio = data.height_ratio;
     }
+    console.log('we are connected, so lets render the game2');
     if (!is_connected && another_peer_id) {
         document.getElementById('peer_key').remove();
         conn = peer.connect(another_peer_id);
@@ -252,4 +296,33 @@ const startDataTransfer = () => {
         //     }
         // })
     }, 10);
+}
+
+const specialAbility = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const character = urlParams.get('character');
+    if (is_won) {
+        return 0;
+    }
+
+    switch (character) {
+        case 'sasuke':
+            teleportObject(whoAmI == 'ghost' ? ghost : ball);
+            break;
+            // case 'neji':
+            //     // var audio = loadSound("byakugan.mp3");
+            //     var audio_1 = new Audio("byakugan.mp3");
+            //     audio_1.play();
+            //     cheatOn();
+            //     break;
+            // case 'rock_lee':
+            //     autoplayOn();
+            //     break;
+        case 'obito':
+            makeObjectTransparent(whoAmI == 'ghost' ? ghost : ball);
+            break;
+
+        default:
+            break;
+    }
 }

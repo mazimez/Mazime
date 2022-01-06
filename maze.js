@@ -555,28 +555,7 @@ const restart = () => {
     window.location.reload();
 }
 
-function randomIntFromInterval(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min)
-}
-const teleportBall = () => {
-    row = randomIntFromInterval(0, cellsVertical - 1);
-    column = randomIntFromInterval(0, cellsHorizontal - 1);
-    var audio = new Audio("teleportation.mp3");
-    audio.play();
-    changePosition(ball, row, column);
-}
-const kamui = () => {
-    ball.render.fillStyle = 'white';
-    ball.collisionFilter = {
-        'category': 2,
-        'mask': 2,
-    };
-    setTimeout(function() {
-        ball.render.fillStyle = 'blue';
-        ball.collisionFilter.category = 1;
-        ball.collisionFilter.mask = -1;
-    }, 500);
-}
+
 const specialAbility = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const character = urlParams.get('character');
@@ -586,7 +565,7 @@ const specialAbility = () => {
 
     switch (character) {
         case 'sasuke':
-            teleportBall();
+            teleportObject(ball);
             break;
         case 'neji':
             // var audio = loadSound("byakugan.mp3");
@@ -598,7 +577,7 @@ const specialAbility = () => {
             autoplayOn();
             break;
         case 'obito':
-            kamui();
+            makeObjectTransparent(ball);
             break;
 
         default:
