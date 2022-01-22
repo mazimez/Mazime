@@ -59,6 +59,8 @@ let ghostRadius;
 let ghost;
 //maze generation
 let setLevel = (level) => {
+
+    //adjusting thickness of the lines according to level
     cellsWidth = 10 - (level - 1);
     if (cellsWidth < 1) {
         cellsWidth = 1;
@@ -85,6 +87,16 @@ let setLevel = (level) => {
     //randomly selecting one cell to start generating maze
     startRow = Math.floor(Math.random() * cellsVertical);
     startColumn = Math.floor(Math.random() * cellsHorizontal)
+
+
+    speedlimit = 15 - (level - 1)
+    if (speedlimit < 4) {
+        speedlimit = 4;
+    }
+    ghost_speed = 30 - ((level - 1) * 5)
+    if (ghost_speed < 5) {
+        ghost_speed = 5;
+    }
 
 
     //creating the goal to finish the game
