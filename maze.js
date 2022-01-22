@@ -2,7 +2,7 @@ let speedlimit = 15; //speedlimit of ball
 let level = 1 //the current level
 let ghost_speed = 30;
 let can_teleport = true;
-
+setLevel(1);
 //adding events listeners for collision
 window.addEventListener("ball_goal_collision", function(evt) {
     if (!is_lose) {

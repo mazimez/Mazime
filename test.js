@@ -42,7 +42,9 @@ window.addEventListener("ball_goal_collision", function(evt) {
         }
     }
     if (whoAmI == 'ghost') {
+        console.log('here1');
         if (!is_won) {
+            console.log('here2');
             is_lose = true;
             if (is_autoplay_on) {
                 autoplayOff();
@@ -222,14 +224,17 @@ const receiveMessage = (data) => {
     if (data.height_ratio) {
         height_ratio = data.height_ratio;
     }
-    console.log('we are connected, so lets render the game2');
+    // console.log('we are connected, so lets render the game2');
     if (!is_connected && another_peer_id) {
         document.getElementById('peer_key').remove();
+        level = parseInt(document.getElementById('choose_level').value);
+        document.getElementById('level_selection').remove();
         conn = peer.connect(another_peer_id);
         conn.on('open', function(data) {
             is_connected = 1;
 
             //we are connected, so lets render the game
+            setLevel(level);
             render = Render.create({
                 element: document.body,
                 engine: engine,
@@ -249,6 +254,7 @@ const receiveMessage = (data) => {
                 "horizontals": horizontals,
                 "width_ratio": width_ratio,
                 "height_ratio": height_ratio,
+                "level": level,
             });
             createMaze();
             World.add(world, goal); //adding the goal to the world
@@ -261,6 +267,10 @@ const receiveMessage = (data) => {
         return 0;
     }
     if (data.verticals && data.horizontals) {
+        if (data.level) {
+            level = data.level;
+            setLevel(level);
+        }
         verticals = data.verticals;
         horizontals = data.horizontals;
         World.add(world, goal); //adding the goal to the world

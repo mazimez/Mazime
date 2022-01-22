@@ -46,27 +46,93 @@ const walls = [
 World.add(world, walls); //adding the wall array to world so it shows on HTML file
 
 
+//declaring variables globally so it can be accessible everywhere
+let grid;
+let verticals;
+let horizontals;
+let startRow;
+let startColumn;
+let goal;
+let ballRadius;
+let ball;
+let ghostRadius;
+let ghost;
 //maze generation
+let setLevel = (level) => {
+    cellsWidth = 10 - (level - 1);
+    if (cellsWidth < 1) {
+        cellsWidth = 1;
+    }
+    cellsHorizontal = level + 5; //adjusting the horizontal based on level
+    cellsVertical = level + 5; //adjusting the vertical based on level
+    unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
+    unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
+    //array that store the data of visited/unvisited cells
+    grid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
 
-//array that store the data of visited/unvisited cells
-let grid = Array(cellsVertical)
-    .fill(null)
-    .map(() => Array(cellsHorizontal).fill(false));
+    //array that stores the data of vertical lines/blocks/rectangles 
+    verticals = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal - 1).fill(false));
 
-//array that stores the data of vertical lines/blocks/rectangles 
-let verticals = Array(cellsVertical)
-    .fill(null)
-    .map(() => Array(cellsHorizontal - 1).fill(false));
+    //array that stores the data of horizontal lines/block/rectangle
+    horizontals = Array(cellsVertical - 1)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
 
-//array that stores the data of horizontal lines/block/rectangle
-let horizontals = Array(cellsVertical - 1)
-    .fill(null)
-    .map(() => Array(cellsHorizontal).fill(false));
+    //randomly selecting one cell to start generating maze
+    startRow = Math.floor(Math.random() * cellsVertical);
+    startColumn = Math.floor(Math.random() * cellsHorizontal)
 
 
-//randomly selecting one cell to start generating maze
-let startRow = Math.floor(Math.random() * cellsVertical);
-let startColumn = Math.floor(Math.random() * cellsHorizontal)
+    //creating the goal to finish the game
+    goal = Bodies.rectangle(
+        width - (unitLengthX / 2), //calculating center x-point of the goal so it will be at bottom
+        height - (unitLengthY / 2), //calculating center y-point of the goal so it will be at bottom
+        unitLengthX * 0.6, //width of the goal block
+        unitLengthY * 0.6, //height of the goal block
+        {
+            isStatic: true, //making it static so gravity doesn't effect it
+            label: 'goal', //labeling it as a goal
+            render: {
+                fillStyle: 'green' //giving it a color
+            }
+        }
+    );
+
+    //creating the ball to start the game
+    ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
+    ball = Bodies.circle(
+        unitLengthX / 2, //center x-point of the ball so it will be at top
+        unitLengthY / 2, //center y-point of the ball so it will be at top
+        ballRadius, //radius of the ball
+        {
+            label: 'ball', //labeling it as ball
+            render: {
+                fillStyle: 'blue' //giving it color
+            }
+        }
+    );
+
+
+    //creating the ghost to follow the ball
+    ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
+    ghost = Bodies.circle(
+        (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
+        unitLengthY / 2, //center y-point of the ghost so it will be at top
+        ghostRadius, //radius of the ghost
+        {
+            label: 'ghost', //labeling it as ghost
+            render: {
+                fillStyle: 'red' //giving it color
+            }
+        }
+    );
+
+}
+
 
 //function that goes throw each and every cells in maze and also update the arrays
 const stepThroughCell = (row, column) => {
@@ -193,48 +259,7 @@ const createMaze = () => {
 
 }
 
-//creating the goal to finish the game
-let goal = Bodies.rectangle(
-    width - (unitLengthX / 2), //calculating center x-point of the goal so it will be at bottom
-    height - (unitLengthY / 2), //calculating center y-point of the goal so it will be at bottom
-    unitLengthX * 0.6, //width of the goal block
-    unitLengthY * 0.6, //height of the goal block
-    {
-        isStatic: true, //making it static so gravity doesn't effect it
-        label: 'goal', //labeling it as a goal
-        render: {
-            fillStyle: 'green' //giving it a color
-        }
-    }
-);
 
-//creating the ball to start the game
-let ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
-let ball = Bodies.circle(
-    unitLengthX / 2, //center x-point of the ball so it will be at top
-    unitLengthY / 2, //center y-point of the ball so it will be at top
-    ballRadius, //radius of the ball
-    {
-        label: 'ball', //labeling it as ball
-        render: {
-            fillStyle: 'blue' //giving it color
-        }
-    }
-);
-
-//creating the ghost to follow the ball
-let ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
-let ghost = Bodies.circle(
-    (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
-    unitLengthY / 2, //center y-point of the ghost so it will be at top
-    ghostRadius, //radius of the ghost
-    {
-        label: 'ghost', //labeling it as ghost
-        render: {
-            fillStyle: 'red' //giving it color
-        }
-    }
-);
 
 //function to add the controls on the object
 const addControlsToObject = (object) => {
