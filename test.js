@@ -14,6 +14,8 @@ let height_ratio = null;
 let is_autoplay_done = 0;
 let is_autoplay_on = 0;
 let auto_play_id;
+let follow_id;
+let is_follow_on = 0;
 //adding events listeners for collision
 window.addEventListener("ball_goal_collision", function(evt) {
     if (whoAmI == 'player') {
@@ -59,6 +61,10 @@ window.addEventListener("ball_goal_collision", function(evt) {
                 }
             });
         }
+    }
+    if (is_follow_on) {
+        is_follow_on = 0;
+        clearInterval(follow_id);
     }
 
 }, false);
@@ -107,7 +113,10 @@ window.addEventListener("ball_ghost_collision", function(evt) {
             });
         }
     }
-
+    if (is_follow_on) {
+        is_follow_on = 0;
+        clearInterval(follow_id);
+    }
 }, false);
 
 window.addEventListener("make_object_transparent", function(evt) {
@@ -320,14 +329,27 @@ const specialAbility = () => {
             teleportObject(whoAmI == 'ghost' ? ghost : ball);
             break;
             // case 'neji':
-            //     // var audio = loadSound("byakugan.mp3");
-            //     var audio_1 = new Audio("byakugan.mp3");
-            //     audio_1.play();
             //     cheatOn();
             //     break;
-            // case 'rock_lee':
-            //     autoplayOn();
-            //     break;
+        case 'rock_lee':
+            let timer = is_in_phone_mode ? 100 : 1;
+            is_follow_on = 1;
+            switch (whoAmI) {
+                case 'ghost':
+                    follow_id = setInterval(function() {
+                        followObject(ghost, ball);
+                    }, timer);
+                    break;
+                case 'player':
+                    follow_id = setInterval(function() {
+                        followObject(ball, goal);
+                    }, timer);
+                    break;
+
+                default:
+                    break;
+            }
+            break;
         case 'obito':
             makeObjectTransparent(whoAmI == 'ghost' ? ghost : ball);
             break;

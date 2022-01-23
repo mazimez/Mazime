@@ -454,3 +454,221 @@ const makeObjectTransparent = (object) => {
         object.collisionFilter.mask = -1;
     }, 500);
 }
+
+
+const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, is_done) => {
+
+    //check if node we are on is already in array path or we reach to goal
+    if (visitedGrid[finishRow][finishColumn]) {
+        if (!is_done) {
+            is_done = 1;
+            return 0;
+        }
+        return 0;
+    }
+    if (visitedGrid[row][column]) {
+        return 0;
+    }
+    //making node visited to puch in array soon
+    visitedGrid[row][column] = true;
+
+
+    //assemble list of neighbour
+    const neighbors = shuffle([
+        [row - 1, column, 'up'],
+        [row, column + 1, 'right'],
+        [row + 1, column, 'down'],
+        [row, column - 1, 'left']
+    ]);
+
+    //for each neighbour
+    for (let neighbor of neighbors) {
+        //see if neigbour is out of bounds
+        const [nextRow, nextColumn, direction] = neighbor;
+        if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
+            continue;
+        }
+
+        //if we visited neigbour, contunie checking
+        if (visitedGrid[nextRow][nextColumn]) {
+            continue;
+        }
+
+        //chek if there is wall between 2 node
+        if (direction === 'up') {
+            if (horizontals[row - 1][column]) {
+                pathGrid[row - 1][column] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'down') {
+            if (horizontals[row][column]) {
+                pathGrid[row + 1][column] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'left') {
+            if (verticals[row][column - 1]) {
+                pathGrid[row][column - 1] = true;
+            } else {
+                continue;
+            }
+        }
+        if (direction === 'right') {
+            if (verticals[row][column]) {
+                pathGrid[row][column + 1] = true;
+            } else {
+                continue;
+            }
+        }
+        should_stay = autoSolve(nextRow, nextColumn, finishRow, finishColumn, visitedGrid, pathGrid, is_done);
+        if (pathGrid[finishRow][finishColumn] && should_stay) {
+
+        } else {
+            if (direction === 'up') {
+                if (horizontals[row - 1][column]) {
+                    pathGrid[row - 1][column] = false;
+                }
+            }
+            if (direction === 'down') {
+                if (horizontals[row][column]) {
+                    pathGrid[row + 1][column] = false;
+                }
+            }
+            if (direction === 'left') {
+                if (verticals[row][column - 1]) {
+                    pathGrid[row][column - 1] = false;
+                }
+            }
+            if (direction === 'right') {
+                if (verticals[row][column]) {
+                    pathGrid[row][column + 1] = false;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+const autoMoveObject = (object, pathGrid, target) => {
+    objectVisitedGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+    let targetRow = target[0];
+    let targetColumn = target[1];
+    let row, column;
+    let is_target_reached = 0;
+    let neighbors;
+    let interval = 0;
+    while (!is_target_reached && interval < 10) {
+        let { x, y } = object.velocity;
+        row = getRow(object);
+        column = getColumn(object);
+        objectVisitedGrid[row, column] = true;
+
+        //assemble list of neighbour
+        neighbors = shuffle([
+            [row - 1, column, 'up'],
+            [row, column + 1, 'right'],
+            [row + 1, column, 'down'],
+            [row, column - 1, 'left']
+        ]);
+
+        //for each neighbour
+        for (let neighbor of neighbors) {
+            interval++;
+            //see if neigbour is out of bounds
+            const [nextRow, nextColumn, direction] = neighbor;
+            if (nextRow < 0 || nextRow >= cellsVertical || nextColumn < 0 || nextColumn >= cellsHorizontal) {
+                continue;
+            }
+
+            //if we visited neigbour, contunie checking
+            if (objectVisitedGrid[nextRow][nextColumn]) {
+                continue;
+            }
+
+            //check in path grid that should we go to that neighbor
+            if (!pathGrid[nextRow][nextColumn]) {
+                continue;
+            }
+
+            //check if there is wall between 2 node
+            if (direction === 'up') {
+                if (horizontals[row - 1][column]) {
+                    if (y < -speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(object, { x, y: y - 3 });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'down') {
+                if (horizontals[row][column]) {
+                    if (y > speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(object, { x, y: y + 3 });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'left') {
+                if (verticals[row][column - 1]) {
+                    if (x < -speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(object, { x: x - 3, y });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            if (direction === 'right') {
+                if (verticals[row][column]) {
+                    if (x > speedlimit) {
+                        //
+                    } else {
+                        Body.setVelocity(object, { x: x + 3, y });
+                    }
+                } else {
+                    continue;
+                }
+            }
+            row = getRow(object);
+            column = getColumn(object);
+            if (row == targetRow && column == targetColumn) {
+                is_target_reached = 1;
+            }
+        }
+    }
+
+}
+
+const followObject = (object, object_to_follow) => {
+    let followVisitedGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    let followPathGrid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    let is_follow_done = 0;
+    autoSolve(
+        getRow(object), //starting row
+        getColumn(object), //starting column
+        getRow(object_to_follow), //finishing row
+        getColumn(object_to_follow), //finishing columns
+        followVisitedGrid, //array to keep track of visited nodes
+        followPathGrid, //array to store the final path
+        is_follow_done, //boll to show is task done
+    );
+    followPathGrid[getRow(object)][getColumn(object)] = true;
+    autoMoveObject(object, followPathGrid, [getRow(object_to_follow), getColumn(object_to_follow)]);
+}
