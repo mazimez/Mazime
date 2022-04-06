@@ -28,6 +28,10 @@ const nextLevel = () => {
         World.remove(world, goal);
         World.remove(world, ghost);
 
+
+        if (is_clone_mode_on) {
+            cloneModeOff()
+        }
         cheatOff();
 
         //updating the data for next level
@@ -69,14 +73,13 @@ const nextLevel = () => {
         startColumn = Math.floor(Math.random() * cellsHorizontal)
 
         stepThroughCell(startRow, startColumn);
-        createMaze();        
+        createMaze();
 
         ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
         ball = Bodies.circle(
             unitLengthX / 2,
             unitLengthY / 2,
-            ballRadius,
-            {
+            ballRadius, {
                 label: 'ball',
                 render: {
                     fillStyle: 'blue'
@@ -104,8 +107,7 @@ const nextLevel = () => {
             width - (unitLengthX / 2),
             height - (unitLengthY / 2),
             unitLengthX * 0.6,
-            unitLengthY * 0.6,
-            {
+            unitLengthY * 0.6, {
                 isStatic: true,
                 label: 'goal',
                 render: {
@@ -115,7 +117,7 @@ const nextLevel = () => {
         );
         World.add(world, goal);
         level++;
-        addControlsToObject(ball);  
+        addControlsToObject(ball);
         ghostPlayOn();
     }
 }

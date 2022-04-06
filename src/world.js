@@ -57,6 +57,7 @@ let ballRadius;
 let ball;
 let ghostRadius;
 let ghost;
+let clone;
 //maze generation
 let setLevel = (level) => {
 
@@ -374,15 +375,20 @@ let is_won = false;
 let is_lose = false;
 let ball_goal_collision_evt = new CustomEvent("ball_goal_collision");
 let ball_ghost_collision_evt = new CustomEvent("ball_ghost_collision");
+let clone_ghost_collision_evt = new CustomEvent("clone_ghost_collision");
 Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach((collision) => {
         const ball_goal_labels = ['ball', 'goal'];
         const ball_ghost_labels = ['ball', 'ghost'];
+        const clone_ghost_labels = ['clone', 'ghost'];
         if (ball_goal_labels.includes(collision.bodyA.label) && ball_goal_labels.includes(collision.bodyB.label)) {
             window.dispatchEvent(ball_goal_collision_evt);
         }
         if (ball_ghost_labels.includes(collision.bodyA.label) && ball_ghost_labels.includes(collision.bodyB.label)) {
             window.dispatchEvent(ball_ghost_collision_evt)
+        }
+        if (clone_ghost_labels.includes(collision.bodyA.label) && clone_ghost_labels.includes(collision.bodyB.label)) {
+            window.dispatchEvent(clone_ghost_collision_evt)
         }
     });
 });
@@ -453,6 +459,23 @@ const makeObjectTransparent = (object) => {
         object.collisionFilter.category = 1;
         object.collisionFilter.mask = -1;
     }, 500);
+}
+
+const makeClone = (object) => {
+    //creating the clone of the given
+    ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
+    clone = Bodies.circle(
+        object.position.x, //center x-point of the ball so it will be at top
+        object.position.y, //center y-point of the ball so it will be at top
+        ballRadius, //radius of the ball
+        {
+            label: 'clone', //labeling it as ball
+            render: {
+                fillStyle: 'white' //giving it color
+            }
+        }
+    );
+    return clone;
 }
 
 
@@ -552,12 +575,16 @@ const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, 
     return 1;
 }
 
-const autoMoveObject = (object, pathGrid, target) => {
+const autoMoveObject = (object, pathGrid, target, speed = 3) => {
+    let targetRow = target[0];
+    let targetColumn = target[1];
+    if (getRow(object) == targetRow && getColumn(object) == targetColumn) {
+        return 1;
+    }
     objectVisitedGrid = Array(cellsVertical)
         .fill(null)
         .map(() => Array(cellsHorizontal).fill(false));
-    let targetRow = target[0];
-    let targetColumn = target[1];
+
     let row, column;
     let is_target_reached = 0;
     let neighbors;
@@ -601,7 +628,7 @@ const autoMoveObject = (object, pathGrid, target) => {
                     if (y < -speedlimit) {
                         //
                     } else {
-                        Body.setVelocity(object, { x, y: y - 3 });
+                        Body.setVelocity(object, { x, y: y - speed });
                     }
                 } else {
                     continue;
@@ -612,7 +639,7 @@ const autoMoveObject = (object, pathGrid, target) => {
                     if (y > speedlimit) {
                         //
                     } else {
-                        Body.setVelocity(object, { x, y: y + 3 });
+                        Body.setVelocity(object, { x, y: y + speed });
                     }
                 } else {
                     continue;
@@ -623,7 +650,7 @@ const autoMoveObject = (object, pathGrid, target) => {
                     if (x < -speedlimit) {
                         //
                     } else {
-                        Body.setVelocity(object, { x: x - 3, y });
+                        Body.setVelocity(object, { x: x - speed, y });
                     }
                 } else {
                     continue;
@@ -634,7 +661,7 @@ const autoMoveObject = (object, pathGrid, target) => {
                     if (x > speedlimit) {
                         //
                     } else {
-                        Body.setVelocity(object, { x: x + 3, y });
+                        Body.setVelocity(object, { x: x + speed, y });
                     }
                 } else {
                     continue;
@@ -647,7 +674,7 @@ const autoMoveObject = (object, pathGrid, target) => {
             }
         }
     }
-
+    return is_target_reached;
 }
 
 const followObject = (object, object_to_follow) => {

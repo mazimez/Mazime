@@ -48,6 +48,13 @@ window.addEventListener("ball_ghost_collision", function(evt) {
     }
 }, false);
 
+window.addEventListener("clone_ghost_collision", function(evt) {
+    if (is_clone_mode_on) {
+        cloneModeOff();
+
+    }
+}, false);
+
 
 //creating the render object on the body tag of HTML file with dimensions
 render = Render.create({
@@ -96,8 +103,11 @@ const cheatOn = () => {
     createLine();
 }
 let is_autoplay_done = 0;
+let is_clone_mode_done = 0;
 let is_autoplay_on = 0;
+let is_clone_mode_on = 0;
 let auto_play_id;
+let clone_mode_id;
 const autoplayOn = () => {
     is_autoplay_on = 1;
     // document.querySelector('#autoplayon').classList.add('hidden');
@@ -107,6 +117,45 @@ const autoplayOn = () => {
     is_autoplay_done = 0;
     auto_play_id = setInterval(function() {
         autoPlay();
+    }, timer);
+}
+const cloneModeOn = (object) => {
+    is_clone_mode_on = 1;
+    // document.querySelector('#autoplayon').classList.add('hidden');
+    // document.querySelector('#autoplayoff').classList.remove('hidden');
+
+    let timer = is_in_phone_mode ? 100 : 1;
+    is_clone_mode_done = 0;
+    let clone_final_row = randomIntFromInterval(0, cellsVertical - 1);
+    let clone_final_column = randomIntFromInterval(0, cellsHorizontal - 1);
+    console.log('clone final row: ' + clone_final_row + ' ,clone final columns ' + clone_final_column);
+    clone_mode_id = setInterval(function() {
+        if (!is_clone_mode_done) {
+            clonePlayVisitedGrid = Array(cellsVertical)
+                .fill(null)
+                .map(() => Array(cellsHorizontal).fill(false));
+
+            clonePlayPathGrid = Array(cellsVertical)
+                .fill(null)
+                .map(() => Array(cellsHorizontal).fill(false));
+            autoSolve(
+                getRow(clone), //starting row
+                getColumn(clone), //starting column
+                clone_final_row, //finishing row
+                clone_final_column, //finishing columns
+                clonePlayVisitedGrid, //array to keep track of visited nodes
+                clonePlayPathGrid, //array to store the final path
+                0, //boll to show is task done
+            );
+            clonePlayPathGrid[getRow(clone)][getColumn(clone)] = true;
+            is_clone_mode_done = autoMoveObject(clone, clonePlayPathGrid, [clone_final_row, clone_final_column], 0.1);
+        } else {
+            is_clone_mode_done = 0;
+            clone_final_row = randomIntFromInterval(0, cellsVertical - 2);
+            clone_final_column = randomIntFromInterval(0, cellsHorizontal - 2);
+            console.log('clone final row: ' + clone_final_row + ' ,clone final columns ' + clone_final_column);
+        }
+
     }, timer);
 }
 let ghost_play_id;
@@ -146,6 +195,15 @@ const autoplayOff = () => {
     if (is_autoplay_on) {
         is_autoplay_on = 0;
         clearInterval(auto_play_id);
+    }
+}
+const cloneModeOff = () => {
+    // document.querySelector('#autoplayoff').classList.add('hidden');
+    // document.querySelector('#autoplayon').classList.remove('hidden');
+    if (is_clone_mode_on) {
+        is_clone_mode_on = 0;
+        clearInterval(clone_mode_id);
+        World.remove(world, clone);
     }
 }
 const createLine = () => {
@@ -321,18 +379,22 @@ const ghostAutoPlay = () => {
         ghostPlayPathGrid = Array(cellsVertical)
             .fill(null)
             .map(() => Array(cellsHorizontal).fill(false));
+        let object_to_catch = ball;
+        if (is_clone_mode_on) {
+            object_to_catch = clone;
+        }
         autoSolve(
             getRow(ghost), //starting row
             getColumn(ghost), //starting column
-            getRow(ball), //finishing row
-            getColumn(ball), //finishing columns
+            getRow(object_to_catch), //finishing row
+            getColumn(object_to_catch), //finishing columns
             ghostPlayVisitedGrid, //array to keep track of visited nodes
             ghostPlayPathGrid, //array to store the final path
             0, //boll to show is task done
         );
         ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
 
-        autoMoveObject(ghost, ghostPlayPathGrid, [getRow(ball), getColumn(ball)]);
+        autoMoveObject(ghost, ghostPlayPathGrid, [getRow(object_to_catch), getColumn(object_to_catch)]);
     }
     //function to autocomplete the game
 const autoPlay = () => {
@@ -386,6 +448,14 @@ const specialAbility = () => {
             break;
         case 'obito':
             makeObjectTransparent(ball);
+            break;
+        case 'naurto':
+            if (!is_clone_mode_on) {
+                clone = makeClone(ball);
+                World.add(world, clone);
+                cloneModeOn(clone);
+            }
+
             break;
 
         default:
