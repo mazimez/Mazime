@@ -1,18 +1,30 @@
-let cellsWidth = 10; //the thickness of the lines
-let cellsHorizontal = 5; //amount of columns at start
-let cellsVertical = 5; //amount of rows at start
-let unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
-let unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
-let is_in_phone_mode = 0;
+//declaring the variables to set-up some basic parameter for world
+let cellsWidth; //the thickness of the lines
+let cellsHorizontal; //amount of columns at start
+let cellsVertical; //amount of rows at start
+let unitLengthX; //the width of one cell(section or box)
+let unitLengthY; // height of one cell(section or box)
+let is_in_phone_mode = 0; //to indicate is game running on phone or not
+
+//declaring variables for maze generation
+let grid; //multidimensional array that stores the rows and columns of maze 
+let verticals; //multidimensional that show where to put the vertical wall
+let horizontals; //multidimensional that show where to put the horizontal wall
+let startRow; //number of row from which the algorithm starts making the maze and walls
+let startColumn; //number of columns from which the algorithm starts making the maze and walls
+
+//declaring variables to show the state of game (win, lose, any collision events etc..)
+let is_won; //is the user playing in this device won?
+let is_lose; //is the user playing in this device lose?
+let ball_goal_collision_evt; //event for the ball and goal collide
+let ball_ghost_collision_evt; //event for the ball and ghost collide
+let clone_ghost_collision_evt; //event for the clone and ghost collide
+let make_object_transparent_evt; //event for the object becoming transparent
+let remove_transparency_evt; //event for the object's transparency removed
+let make_clone_evt; //event for the object's clone creation;
+let remove_clone_evt //event for the object's clone removal;
 
 //creating the array of the walls(rectangles) that cover the world
-// Bodies.rectangle(
-//     "x-position of this object",
-//     "y-position of this object",
-//     "width of this object",
-//     "height of this object",
-//     "any other options you want to add"
-// ),
 const walls = [
     Bodies.rectangle(width / 2, 0, width, 10, {
         isStatic: true,
@@ -45,106 +57,6 @@ const walls = [
 ];
 World.add(world, walls); //adding the wall array to world so it shows on HTML file
 
-
-//declaring variables globally so it can be accessible everywhere
-let grid;
-let verticals;
-let horizontals;
-let startRow;
-let startColumn;
-let goal;
-let ballRadius;
-let ball;
-let ghostRadius;
-let ghost;
-let clone;
-//maze generation
-let setLevel = (level) => {
-
-    //adjusting thickness of the lines according to level
-    cellsWidth = 10 - (level - 1);
-    if (cellsWidth < 1) {
-        cellsWidth = 1;
-    }
-    cellsHorizontal = level + 5; //adjusting the horizontal based on level
-    cellsVertical = level + 5; //adjusting the vertical based on level
-    unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
-    unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
-    //array that store the data of visited/unvisited cells
-    grid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-
-    //array that stores the data of vertical lines/blocks/rectangles 
-    verticals = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal - 1).fill(false));
-
-    //array that stores the data of horizontal lines/block/rectangle
-    horizontals = Array(cellsVertical - 1)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-
-    //randomly selecting one cell to start generating maze
-    startRow = Math.floor(Math.random() * cellsVertical);
-    startColumn = Math.floor(Math.random() * cellsHorizontal)
-
-
-    speedlimit = 15 - (level - 1)
-    if (speedlimit < 4) {
-        speedlimit = 4;
-    }
-    ghost_speed = 30 - ((level - 1) * 5)
-    if (ghost_speed < 5) {
-        ghost_speed = 5;
-    }
-
-
-    //creating the goal to finish the game
-    goal = Bodies.rectangle(
-        width - (unitLengthX / 2), //calculating center x-point of the goal so it will be at bottom
-        height - (unitLengthY / 2), //calculating center y-point of the goal so it will be at bottom
-        unitLengthX * 0.6, //width of the goal block
-        unitLengthY * 0.6, //height of the goal block
-        {
-            isStatic: true, //making it static so gravity doesn't effect it
-            label: 'goal', //labeling it as a goal
-            render: {
-                fillStyle: 'green' //giving it a color
-            }
-        }
-    );
-
-    //creating the ball to start the game
-    ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
-    ball = Bodies.circle(
-        unitLengthX / 2, //center x-point of the ball so it will be at top
-        unitLengthY / 2, //center y-point of the ball so it will be at top
-        ballRadius, //radius of the ball
-        {
-            label: 'ball', //labeling it as ball
-            render: {
-                fillStyle: 'blue' //giving it color
-            }
-        }
-    );
-
-
-    //creating the ghost to follow the ball
-    ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
-    ghost = Bodies.circle(
-        (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
-        unitLengthY / 2, //center y-point of the ghost so it will be at top
-        ghostRadius, //radius of the ghost
-        {
-            label: 'ghost', //labeling it as ghost
-            render: {
-                fillStyle: 'red' //giving it color
-            }
-        }
-    );
-
-}
 
 
 //function that goes throw each and every cells in maze and also update the arrays
@@ -370,12 +282,12 @@ const addControlsToObject = (object) => {
     }
 }
 
-//collision condition
-let is_won = false;
-let is_lose = false;
-let ball_goal_collision_evt = new CustomEvent("ball_goal_collision");
-let ball_ghost_collision_evt = new CustomEvent("ball_ghost_collision");
-let clone_ghost_collision_evt = new CustomEvent("clone_ghost_collision");
+//collision condition && events
+is_won = false;
+is_lose = false;
+ball_goal_collision_evt = new CustomEvent("ball_goal_collision");
+ball_ghost_collision_evt = new CustomEvent("ball_ghost_collision");
+clone_ghost_collision_evt = new CustomEvent("clone_ghost_collision");
 Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach((collision) => {
         const ball_goal_labels = ['ball', 'goal'];
@@ -393,6 +305,7 @@ Events.on(engine, 'collisionStart', event => {
     });
 });
 
+//TODO::check if we need this method or not
 function enterEvent(event) {
     if (['Enter', ' '].includes(event.key)) {
         document.removeEventListener('keypress', enterEvent);
@@ -404,29 +317,33 @@ function enterEvent(event) {
 /*useful methods*/
 //function to get the number of rows that the given object is in
 const getRow = (object) => {
-        return (parseInt(object.position.y / unitLengthY));
-    }
-    //function to get the number of columns that the given object is in
+    return (parseInt(object.position.y / unitLengthY));
+}
+
+//function to get the number of columns that the given object is in
 const getColumn = (object) => {
-        return (parseInt(object.position.x / unitLengthX));
-    }
-    //function to set the number of rows that the given object is in
+    return (parseInt(object.position.x / unitLengthX));
+}
+
+//function to set the number of rows that the given object is in
 const setRow = (object, row) => {
-        if (row >= 0 && row < cellsVertical) {
-            Body.setPosition(object, { x: object.position.x, y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
-        } else {
-            throw new Error('out of bound');
-        }
+    if (row >= 0 && row < cellsVertical) {
+        Body.setPosition(object, { x: object.position.x, y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
+    } else {
+        throw new Error('out of bound');
     }
-    //function to set the number of columns that the given object is in
+}
+
+//function to set the number of columns that the given object is in
 const setColumn = (object, column) => {
-        if (column >= 0 && column < cellsHorizontal) {
-            Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: object.position.y });
-        } else {
-            throw new Error('out of bound');
-        }
+    if (column >= 0 && column < cellsHorizontal) {
+        Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: object.position.y });
+    } else {
+        throw new Error('out of bound');
     }
-    //change position of any object in maze
+}
+
+//change position of any object in maze
 const changePosition = (object, row, column) => {
     if (column >= 0 && column < cellsHorizontal && row >= 0 && row < cellsVertical) {
         Body.setPosition(object, { x: ((unitLengthX * (column + 1)) - (unitLengthX / 2)), y: ((unitLengthY * (row + 1)) - (unitLengthY / 2)) });
@@ -435,6 +352,8 @@ const changePosition = (object, row, column) => {
     }
 }
 
+
+//method to teleport he object to random place in maze
 const teleportObject = (object) => {
     row = randomIntFromInterval(0, cellsVertical - 1);
     column = randomIntFromInterval(0, cellsHorizontal - 1);
@@ -443,8 +362,10 @@ const teleportObject = (object) => {
     changePosition(object, row, column);
 }
 
-let make_object_transparent_evt = new CustomEvent("make_object_transparent");
-let remove_transparency_evt = new CustomEvent("remove_transparency");
+
+//method to make the object transparent
+make_object_transparent_evt = new CustomEvent("make_object_transparent");
+remove_transparency_evt = new CustomEvent("remove_transparency");
 const makeObjectTransparent = (object) => {
     let color = object.render.fillStyle;
     object.render.fillStyle = 'white';
@@ -461,6 +382,9 @@ const makeObjectTransparent = (object) => {
     }, 500);
 }
 
+//method to make the clone of the object
+make_clone_evt = new CustomEvent("make_clone");
+remove_clone_evt = new CustomEvent("remove_clone");
 const makeClone = (object) => {
     //creating the clone of the given
     ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ball so it will always fit in the game
@@ -475,10 +399,12 @@ const makeClone = (object) => {
             }
         }
     );
+    window.dispatchEvent(make_clone_evt);
     return clone;
 }
 
 
+//method to give the solved path-arrays from 1 place in maze to another place
 const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, is_done) => {
 
     //check if node we are on is already in array path or we reach to goal
@@ -575,6 +501,7 @@ const autoSolve = (row, column, finishRow, finishColumn, visitedGrid, pathGrid, 
     return 1;
 }
 
+//method to move the object automatically just by given the path-arrays
 const autoMoveObject = (object, pathGrid, target, speed = 3) => {
     let targetRow = target[0];
     let targetColumn = target[1];
@@ -677,6 +604,7 @@ const autoMoveObject = (object, pathGrid, target, speed = 3) => {
     return is_target_reached;
 }
 
+//method that makes 1 object follow
 const followObject = (object, object_to_follow) => {
     let followVisitedGrid = Array(cellsVertical)
         .fill(null)

@@ -133,6 +133,13 @@ window.addEventListener("remove_transparency", function(evt) {
         },
     });
 }, false);
+// window.addEventListener("make_clone", function(evt) {
+//     conn.send({
+//         "make_clone": {
+//             "object": whoAmI,
+//         },
+//     });
+// }, false);
 
 
 
@@ -209,6 +216,7 @@ const receiveMessage = (data) => {
             };
         }
     }
+
     if (data.remove_transparency) {
         if (data.remove_transparency.object == 'ghost') {
             ghost.render.fillStyle = 'red';
@@ -294,16 +302,40 @@ const receiveMessage = (data) => {
 }
 const startDataTransfer = () => {
     setInterval(function() {
-        conn.send({
-            "ball": {
-                "x": ball.position.x / width_ratio,
-                "y": ball.position.y / height_ratio,
-            },
-            "ghost": {
-                "x": ghost.position.x * width_ratio,
-                "y": ghost.position.y * height_ratio,
+        if (is_clone_mode_on) {
+            switch (whoAmI) {
+                case 'ghost':
+
+                    break;
+                case 'player':
+                    conn.send({
+                        "ball": {
+                            "x": clone.position.x / width_ratio,
+                            "y": clone.position.y / height_ratio,
+                        },
+                        "ghost": {
+                            "x": ghost.position.x * width_ratio,
+                            "y": ghost.position.y * height_ratio,
+                        }
+                    });
+                    break;
+
+                default:
+                    break;
             }
-        });
+        } else {
+            conn.send({
+                "ball": {
+                    "x": ball.position.x / width_ratio,
+                    "y": ball.position.y / height_ratio,
+                },
+                "ghost": {
+                    "x": ghost.position.x * width_ratio,
+                    "y": ghost.position.y * height_ratio,
+                }
+            });
+        }
+
         // sendMessage({
         //     "ball":{
         //         "x":ball.position.x,
@@ -352,6 +384,25 @@ const specialAbility = () => {
             break;
         case 'obito':
             makeObjectTransparent(whoAmI == 'ghost' ? ghost : ball);
+            break;
+
+        case 'naurto':
+            switch (whoAmI) {
+                case 'ghost':
+
+                    break;
+                case 'player':
+                    if (!is_clone_mode_on) {
+                        clone = makeClone(ball);
+                        World.add(world, clone);
+
+                        cloneModeOn(clone);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
             break;
 
         default:

@@ -1,3 +1,58 @@
+//maze generation for given level
+let setLevel = (level) => {
+
+    //adjusting thickness of the lines according to level
+    cellsWidth = 10 - (level - 1);
+    if (cellsWidth < 1) {
+        cellsWidth = 1;
+    }
+    cellsHorizontal = level + 5; //adjusting the horizontal based on level
+    cellsVertical = level + 5; //adjusting the vertical based on level
+    unitLengthX = width / cellsHorizontal; //calculating the width of one cell(section or box)
+    unitLengthY = height / cellsVertical; //calculating the height of one cell(section or box)
+    //array that store the data of visited/unvisited cells
+    grid = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    //array that stores the data of vertical lines/blocks/rectangles 
+    verticals = Array(cellsVertical)
+        .fill(null)
+        .map(() => Array(cellsHorizontal - 1).fill(false));
+
+    //array that stores the data of horizontal lines/block/rectangle
+    horizontals = Array(cellsVertical - 1)
+        .fill(null)
+        .map(() => Array(cellsHorizontal).fill(false));
+
+    //randomly selecting one cell to start generating maze
+    startRow = Math.floor(Math.random() * cellsVertical);
+    startColumn = Math.floor(Math.random() * cellsHorizontal)
+
+
+    speedlimit = 15 - (level - 1)
+    if (speedlimit < 4) {
+        speedlimit = 4;
+    }
+    ghost_speed = 30 - ((level - 1) * 5)
+    if (ghost_speed < 5) {
+        ghost_speed = 5;
+    }
+
+
+    //creating the goal to finish the game
+    createGoalObject();
+
+    //creating the ball to start the game
+    createPlayerObject();
+
+    //creating the ghost to follow the ball
+    createGhostObject();
+
+}
+
+
+
 //next Level
 const nextLevel = () => {
     special_ability_count_left = 3;
@@ -75,49 +130,21 @@ const nextLevel = () => {
         stepThroughCell(startRow, startColumn);
         createMaze();
 
-        ballRadius = Math.min(unitLengthX, unitLengthY) * 0.2;
-        ball = Bodies.circle(
-            unitLengthX / 2,
-            unitLengthY / 2,
-            ballRadius, {
-                label: 'ball',
-                render: {
-                    fillStyle: 'blue'
-                }
-            }
-        );
+        createPlayerObject();
         World.add(world, ball);
 
-        ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
-        ghost = Bodies.circle(
-            (unitLengthX * cellsHorizontal) - (unitLengthX / 2), //center x-point of the ghost so it will be at top
-            unitLengthY / 2,
-            ghostRadius, //radius of the ghost
-            {
-                label: 'ghost', //labeling it as ghost
-                render: {
-                    fillStyle: 'red' //giving it color
-                }
-            }
-        );
+        createGhostObject();
         World.add(world, ghost);
 
-
-        goal = Bodies.rectangle(
-            width - (unitLengthX / 2),
-            height - (unitLengthY / 2),
-            unitLengthX * 0.6,
-            unitLengthY * 0.6, {
-                isStatic: true,
-                label: 'goal',
-                render: {
-                    fillStyle: 'green'
-                }
-            }
-        );
+        createGoalObject();
         World.add(world, goal);
         level++;
         addControlsToObject(ball);
         ghostPlayOn();
     }
+}
+
+//method to restart the whole game(reload page)
+const restart = () => {
+    window.location.reload();
 }
