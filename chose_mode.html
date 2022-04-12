@@ -188,7 +188,7 @@
     const startSinglePlayer = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const character = urlParams.get('character');
-        let url = "start_game.html?character=" + character;
+        let url = "single_player.html?character=" + character;
         window.location.replace(url);
     }
     const startMultiPlayer = () => {
