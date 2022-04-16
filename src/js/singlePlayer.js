@@ -71,11 +71,10 @@ window.addEventListener("ball_ghost_collision", function(evt) {
     }
 }, false);
 
-//clone+ghost
-window.addEventListener("clone_ghost_collision", function(evt) {
+//ball clone+ghost
+window.addEventListener("ball_clone_ghost_collision", function(evt) {
     if (is_clone_mode_on) {
-        cloneModeOff();
-
+        deactivateClone();
     }
 }, false);
 
@@ -105,10 +104,14 @@ const specialAbility = () => {
             teleportObject(ball);
             break;
         case 'neji':
+            //TODO::play the audio but fix the problem of having to load it every time that's making game slow
             // var audio = loadSound("byakugan.mp3");
-            var audio_1 = new Audio("byakugan.mp3");
-            audio_1.play();
-            cheatOn();
+            // var audio_1 = new Audio("assets/audio/byakugan.mp3");
+            // audio_1.play();
+            showPath(getRow(ball), getColumn(ball), getRow(goal), getColumn(goal));
+            setTimeout(function() {
+                hidePath();
+            }, special_ability_wait_time);
             break;
         case 'rock_lee':
             autoplayOn();
@@ -118,9 +121,7 @@ const specialAbility = () => {
             break;
         case 'naurto':
             if (!is_clone_mode_on) {
-                clone = makeClone(ball);
-                World.add(world, clone);
-                cloneModeOn(clone);
+                activateClone(ball);
             }
 
             break;
@@ -136,16 +137,18 @@ is_special_ability_in_use = 0;
 //method to manage the special ability counts and views
 const useSpecialAbility = () => {
     if (special_ability_count_left <= 0) {
-        document.querySelector('#special').classList.add('hidden');
+        document.querySelector('#special').classList.add('deactivate');
         return 0;
     }
     if (!is_special_ability_in_use) {
-        document.querySelector('#special').classList.add('hidden');
+        document.querySelector('#special').classList.add('deactivate');
         special_ability_count_left = special_ability_count_left - 1;
         is_special_ability_in_use = 1;
         specialAbility();
         setTimeout(function() {
-            document.querySelector('#special').classList.remove('hidden');
+            if (special_ability_count_left > 0) {
+                document.querySelector('#special').classList.remove('deactivate');
+            }
             is_special_ability_in_use = 0;
         }, special_ability_wait_time);
     }

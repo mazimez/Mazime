@@ -85,9 +85,9 @@ const nextLevel = () => {
 
 
         if (is_clone_mode_on) {
-            cloneModeOff()
+            deactivateClone()
         }
-        cheatOff();
+        hidePath();
 
         //updating the data for next level
 

@@ -1,4 +1,4 @@
-//CODE TO set-up peer-js 
+//variables to set-up peer-js 
 let peer = new Peer(); //peer object manage RTC connection
 let peer_id = null; //id of peer object
 let another_peer_id = null; //id of peer on another side
@@ -17,6 +17,7 @@ let height_ratio = null;
 //variable to manage the followObject feature 
 let follow_id;
 let is_follow_on = 0;
+
 
 //opening connection channel for peer to connect
 peer.on('open', function(id) {
@@ -82,6 +83,9 @@ const receiveMessage = (data) => {
         level = parseInt(document.getElementById('choose_level').value);
         document.getElementById('level_selection').remove();
 
+        //adding the option to use the special ability
+        document.getElementById('special').classList.remove('hidden')
+
         //connecting this device with first message sender device(joiner)
         conn = peer.connect(another_peer_id);
         conn.on('open', function(data) {
@@ -126,6 +130,14 @@ const receiveMessage = (data) => {
         return 0;
     }
 
+    //if ratio are given by host then changing it's value on joiner side
+    if (data.width_ratio) {
+        width_ratio = data.width_ratio;
+    }
+    if (data.height_ratio) {
+        height_ratio = data.height_ratio;
+    }
+
     //from joiner side, once we get the data of maze and ratio. we render the same game on joiner side too
     if (data.verticals && data.horizontals) {
         //setting up level
@@ -156,43 +168,60 @@ const receiveMessage = (data) => {
         Body.setPosition(ghost, { x: data.ghost.x, y: data.ghost.y });
     }
 
-
+    //making the given object transparent
     if (data.make_object_transparent) {
         if (data.make_object_transparent.object == 'ghost') {
-            ghost.render.fillStyle = 'white';
-            ghost.collisionFilter = {
-                'category': 2,
-                'mask': 2,
-            };
+            //TODO::decide if we need to do something if the other player gets transparent
         }
         if (data.make_object_transparent.object == 'player') {
-            ball.render.fillStyle = 'white';
-            ball.collisionFilter = {
-                'category': 2,
-                'mask': 2,
-            };
+            //TODO::decide if we need to do something if the other player gets transparent
         }
     }
 
+    //removing transparency of given object
     if (data.remove_transparency) {
-        if (data.remove_transparency.object == 'ghost') {
-            ghost.render.fillStyle = 'red';
-            ghost.collisionFilter.category = 1;
-            ghost.collisionFilter.mask = -1;
-        }
-        if (data.remove_transparency.object == 'player') {
-            ball.render.fillStyle = 'blue';
-            ball.collisionFilter.category = 1;
-            ball.collisionFilter.mask = -1;
-        }
-    }
-    if (data.width_ratio) {
-        width_ratio = data.width_ratio;
-    }
-    if (data.height_ratio) {
-        height_ratio = data.height_ratio;
+        //TODO::decide if we need to do something if the other player remove transparency
     }
 
+    //changing the label of object to clone of itself
+    if (data.make_clone) {
+        if (data.make_clone.object == 'ghost') {
+            ghost.label = "ghost_clone";
+        }
+        if (data.make_clone.object == 'player') {
+            ball.label = "ball_clone";
+        }
+    }
+
+    //checking if other peer is already lost by clone
+    if (data.lost) {
+        if (data.lost.object == 'ghost') {
+            window.dispatchEvent(ball_goal_collision_evt)
+        }
+        if (data.lost.object == 'player') {
+            window.dispatchEvent(ball_ghost_collision_evt)
+        }
+    }
+
+    //checking if other peer is already won by clone
+    if (data.won) {
+        if (data.won.object == 'ghost') {
+            window.dispatchEvent(ball_ghost_collision_evt)
+        }
+        if (data.won.object == 'player') {
+            window.dispatchEvent(ball_goal_collision_evt)
+        }
+    }
+
+    //deactivating the clone is other player has catch the clone on it side
+    if (data.deactivate_clone) {
+        if (data.deactivate_clone.object == 'ghost') {
+            deactivateClone();
+        }
+        if (data.deactivate_clone.object == 'player') {
+            deactivateClone();
+        }
+    }
 
 
 }
@@ -204,7 +233,16 @@ const startDataTransfer = () => {
         if (is_clone_mode_on) {
             switch (whoAmI) {
                 case 'ghost':
-
+                    conn.send({
+                        "ball": {
+                            "x": ball.position.x / width_ratio,
+                            "y": ball.position.y / height_ratio,
+                        },
+                        "ghost": {
+                            "x": clone.position.x * width_ratio,
+                            "y": clone.position.y * height_ratio,
+                        }
+                    });
                     break;
                 case 'player':
                     conn.send({
@@ -254,6 +292,14 @@ window.addEventListener("ball_goal_collision", function(evt) {
             } catch (err) {
 
             }
+            if (is_clone_mode_on) {
+                window.dispatchEvent(ball_clone_ghost_collision_evt)
+                conn.send({
+                    "won": {
+                        "object": whoAmI,
+                    },
+                });
+            }
 
             document.querySelector('.winner').classList.remove('hidden');
             document.addEventListener('keypress', enterEvent);
@@ -273,6 +319,7 @@ window.addEventListener("ball_goal_collision", function(evt) {
             if (is_autoplay_on) {
                 autoplayOff();
             }
+
             // ghostplayOff();
             document.querySelector('.losser').classList.remove('hidden');
             document.addEventListener('keypress', enterEvent);
@@ -298,6 +345,15 @@ window.addEventListener("ball_ghost_collision", function(evt) {
             if (is_autoplay_on) {
                 autoplayOff();
             }
+            if (is_clone_mode_on) {
+                window.dispatchEvent(ball_clone_ghost_collision_evt)
+                conn.send({
+                    "lost": {
+                        "object": whoAmI,
+                    },
+                });
+            }
+
             // ghostplayOff();
             document.querySelector('.losser').classList.remove('hidden');
             document.addEventListener('keypress', enterEvent);
@@ -324,7 +380,14 @@ window.addEventListener("ball_ghost_collision", function(evt) {
             } catch (err) {
 
             }
-
+            if (is_clone_mode_on) {
+                window.dispatchEvent(ghost_clone_ball_collision_evt)
+                conn.send({
+                    "won": {
+                        "object": whoAmI,
+                    },
+                });
+            }
             document.querySelector('.winner').classList.remove('hidden');
             document.addEventListener('keypress', enterEvent);
             // world.gravity.y = 1;
@@ -355,14 +418,58 @@ window.addEventListener("remove_transparency", function(evt) {
         },
     });
 }, false);
-// window.addEventListener("make_clone", function(evt) {
-//     conn.send({
-//         "make_clone": {
-//             "object": whoAmI,
-//         },
-//     });
-// }, false);
+window.addEventListener("make_clone", function(evt) {
+    conn.send({
+        "make_clone": {
+            "object": whoAmI,
+        },
+    });
+}, false);
+//ball clone+ghost
+window.addEventListener("ball_clone_ghost_collision", function(evt) {
+    if (whoAmI == 'player') {
+        deactivateClone();
+    }
+    if (whoAmI == 'ghost') {
+        if (is_clone_mode_on) {
+            conn.send({
+                "deactivate_clone": {
+                    "object": "player",
+                },
+            });
+        }
+        ball.label = "ball";
+    }
+}, false);
 
+//ball clone+ghost clone
+window.addEventListener("ghost_clone_ball_clone_collision", function(evt) {
+    if (whoAmI == 'player') {
+        deactivateClone();
+        ghost.label = "ghost";
+    }
+    if (whoAmI == 'ghost') {
+        deactivateClone();
+        ball.label = "ball";
+    }
+}, false);
+
+//ghost clone+ball
+window.addEventListener("ghost_clone_ball_collision", function(evt) {
+    if (whoAmI == 'player') {
+        if (is_clone_mode_on) {
+            conn.send({
+                "deactivate_clone": {
+                    "object": "ghost",
+                },
+            });
+        }
+        ghost.label = "ghost";
+    }
+    if (whoAmI == 'ghost') {
+        deactivateClone();
+    }
+}, false);
 
 //method to activate the special ability based on selected character
 const specialAbility = () => {
@@ -376,9 +483,33 @@ const specialAbility = () => {
         case 'sasuke':
             teleportObject(whoAmI == 'ghost' ? ghost : ball);
             break;
-            // case 'neji':
-            //     cheatOn();
-            //     break;
+        case 'neji':
+            switch (whoAmI) {
+                case 'ghost':
+                    //TODO::play the audio but fix the problem of having to load it every time that's making game slow
+                    // var audio = loadSound("byakugan.mp3");
+                    // var audio_1 = new Audio("assets/audio/byakugan.mp3");
+                    // audio_1.play();
+                    showPath(getRow(ghost), getColumn(ghost), getRow(ball), getColumn(ball));
+                    setTimeout(function() {
+                        hidePath();
+                    }, special_ability_wait_time);
+                    break;
+                case 'player':
+                    //TODO::play the audio but fix the problem of having to load it every time that's making game slow
+                    // var audio = loadSound("byakugan.mp3");
+                    // var audio_1 = new Audio("assets/audio/byakugan.mp3");
+                    // audio_1.play();
+                    showPath(getRow(ball), getColumn(ball), getRow(goal), getColumn(goal));
+                    setTimeout(function() {
+                        hidePath();
+                    }, special_ability_wait_time);
+                    break;
+
+                default:
+                    break;
+            }
+            break;
         case 'rock_lee':
             let timer = is_in_phone_mode ? 100 : 1;
             is_follow_on = 1;
@@ -405,14 +536,13 @@ const specialAbility = () => {
         case 'naurto':
             switch (whoAmI) {
                 case 'ghost':
-
+                    if (!is_clone_mode_on) {
+                        activateClone(ghost);
+                    }
                     break;
                 case 'player':
                     if (!is_clone_mode_on) {
-                        clone = makeClone(ball);
-                        World.add(world, clone);
-
-                        cloneModeOn(clone);
+                        activateClone(ball);
                     }
                     break;
 
@@ -424,4 +554,27 @@ const specialAbility = () => {
         default:
             break;
     }
+}
+special_ability_count_left = 3;
+special_ability_wait_time = 2000;
+is_special_ability_in_use = 0;
+//method to manage the special ability counts and views
+const useSpecialAbility = () => {
+    if (special_ability_count_left <= 0) {
+        document.querySelector('#special').classList.add('deactivate');
+        return 0;
+    }
+    if (!is_special_ability_in_use) {
+        document.querySelector('#special').classList.add('deactivate');
+        special_ability_count_left = special_ability_count_left - 1;
+        is_special_ability_in_use = 1;
+        specialAbility();
+        setTimeout(function() {
+            if (special_ability_count_left > 0) {
+                document.querySelector('#special').classList.remove('deactivate');
+            }
+            is_special_ability_in_use = 0;
+        }, special_ability_wait_time);
+    }
+
 }

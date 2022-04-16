@@ -1,20 +1,29 @@
-* { font-family: 'Inter', sans-serif; }
-@supports (font-variation-settings: normal) {
-  * { font-family: 'Inter var', sans-serif; }
+* {
+    font-family: 'Inter', sans-serif;
 }
 
-body, html{
+@supports (font-variation-settings: normal) {
+    * {
+        font-family: 'Inter var', sans-serif;
+    }
+}
+
+body,
+html {
     margin: 0;
     padding: 0;
 }
-.hidden{
+
+.hidden {
     display: none !important;
 }
-h1{
-    color:white;
+
+h1 {
+    color: white;
     font-size: 64px;
 }
-.winner{
+
+.winner {
     display: grid;
     place-items: center;
     position: absolute;
@@ -22,7 +31,8 @@ h1{
     height: 100vh;
     width: 100vw;
 }
-.losser{
+
+.losser {
     display: grid;
     place-items: center;
     position: absolute;
@@ -30,43 +40,53 @@ h1{
     height: 100vh;
     width: 100vw;
 }
-.winner button{
+
+.winner button {
     background-color: green;
     font-size: 70px;
 }
-.losser button{
+
+.losser button {
     background-color: red;
     font-size: 70px;
 }
-.cheat{
+
+.cheat {
     display: grid;
     place-items: center;
     position: absolute;
-    bottom:10px;    
-    right:10px;
+    bottom: 10px;
+    right: 10px;
     z-index: 1;
 }
-.autoplay{
+
+.autoplay {
     display: grid;
     place-items: center;
     position: absolute;
-    bottom:10px;    
-    left:10px;
+    bottom: 10px;
+    left: 10px;
     z-index: 1;
 }
-.ghost{
+
+.ghost {
     display: grid;
     place-items: center;
     position: absolute;
-    bottom:10px;    
-    left:130px;
+    bottom: 10px;
+    left: 130px;
     z-index: 1;
 }
-.special{
+
+.special {
     display: grid;
     place-items: center;
     position: absolute;
-    bottom:20px;    
-    left:20px;
+    bottom: 20px;
+    left: 20px;
     z-index: 1;
+}
+
+.deactivate {
+    opacity: 20%;
 }

@@ -1,22 +1,8 @@
 let speedlimit = 15; //speedlimit of ball
 
-
-//variables related to player's clone
-let is_clone_mode_done = 0;
-let is_clone_mode_on = 0;
-let clone_mode_id;
-let clone;
-
 //variables related to player
 let ballRadius;
 let ball;
-
-//variable for player's cheat mode
-let cheatGrid;
-let lVerticals;
-let lHorizontals;
-let is_win = 0;
-let off = [];
 
 //variable for player's autoplay mode
 let is_autoplay_done = 0;
@@ -39,24 +25,6 @@ const createPlayerObject = () => {
     );
 }
 
-//method to turn the cheat mode on
-const cheatOn = () => {
-    // document.querySelector('#cheaton').classList.add('hidden');
-    // document.querySelector('#cheatoff').classList.remove('hidden');
-
-    is_win = 0;
-    cheatGrid = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(false));
-    lVerticals = Array(cellsVertical - 1)
-        .fill(null)
-        .map(() => Array(cellsHorizontal).fill(true));
-    lHorizontals = Array(cellsVertical)
-        .fill(null)
-        .map(() => Array(cellsHorizontal - 1).fill(true));
-    solve(getRow(ball), getColumn(ball));
-    createLine();
-}
 
 //method to solve the cheat-mode path
 const solve = (row, column) => {
@@ -155,78 +123,6 @@ const solve = (row, column) => {
     return 1;
 }
 
-//method to create the line for player's cheat mode
-const createLine = () => {
-    lHorizontals.forEach((row, rowIndex) => {
-        row.forEach((open, columnIndex) => {
-            if (open) {
-                return;
-            }
-            const line = Bodies.rectangle(
-                columnIndex * unitLengthX + unitLengthX,
-                rowIndex * unitLengthY + (unitLengthY / 2),
-                unitLengthX,
-                3, {
-                    label: 'line',
-                    isStatic: true,
-                    render: {
-                        fillStyle: 'green'
-                    },
-                    collisionFilter: {
-                        group: -1,
-                        category: 2,
-                        mask: 0
-                    }
-                }
-            );
-            World.add(world, line);
-        })
-    });
-
-    lVerticals.forEach((row, rowIndex) => {
-        row.forEach((open, columnIndex) => {
-            if (open) {
-                return;
-            }
-            const line = Bodies.rectangle(
-                columnIndex * unitLengthX + (unitLengthX / 2),
-                rowIndex * unitLengthY + unitLengthY,
-                3,
-                unitLengthY, {
-                    label: 'line',
-                    isStatic: true,
-                    render: {
-                        fillStyle: 'green'
-                    },
-                    collisionFilter: {
-                        group: -1,
-                        category: 2,
-                        mask: 0
-                    }
-                }
-            );
-            World.add(world, line);
-        })
-    })
-
-}
-
-//method to turn the cheat mode off
-const cheatOff = () => {
-    // document.querySelector('#cheaton').classList.remove('hidden');
-    // document.querySelector('#cheatoff').classList.add('hidden');
-    world.bodies.forEach(body => {
-        if (body.label === 'line') {
-            off.push(body);
-        }
-    });
-    off.forEach((body) => {
-        World.remove(world, body);
-    });
-}
-
-
-
 //method to turn the auto play mode on
 const autoplayOn = () => {
     is_autoplay_on = 1;
@@ -271,58 +167,5 @@ const autoplayOff = () => {
     if (is_autoplay_on) {
         is_autoplay_on = 0;
         clearInterval(auto_play_id);
-    }
-}
-
-
-
-//method to make the clone run on random path
-const cloneModeOn = (object) => {
-    is_clone_mode_on = 1;
-    // document.querySelector('#autoplayon').classList.add('hidden');
-    // document.querySelector('#autoplayoff').classList.remove('hidden');
-
-    let timer = is_in_phone_mode ? 100 : 1;
-    is_clone_mode_done = 0;
-    let clone_final_row = randomIntFromInterval(0, cellsVertical - 1);
-    let clone_final_column = randomIntFromInterval(0, cellsHorizontal - 1);
-    clone_mode_id = setInterval(function() {
-        if (!is_clone_mode_done) {
-            clonePlayVisitedGrid = Array(cellsVertical)
-                .fill(null)
-                .map(() => Array(cellsHorizontal).fill(false));
-
-            clonePlayPathGrid = Array(cellsVertical)
-                .fill(null)
-                .map(() => Array(cellsHorizontal).fill(false));
-            autoSolve(
-                getRow(clone), //starting row
-                getColumn(clone), //starting column
-                clone_final_row, //finishing row
-                clone_final_column, //finishing columns
-                clonePlayVisitedGrid, //array to keep track of visited nodes
-                clonePlayPathGrid, //array to store the final path
-                0, //boll to show is task done
-            );
-            clonePlayPathGrid[getRow(clone)][getColumn(clone)] = true;
-            is_clone_mode_done = autoMoveObject(clone, clonePlayPathGrid, [clone_final_row, clone_final_column], 0.1);
-        } else {
-            is_clone_mode_done = 0;
-            clone_final_row = randomIntFromInterval(0, cellsVertical - 2);
-            clone_final_column = randomIntFromInterval(0, cellsHorizontal - 2);
-        }
-
-    }, timer);
-}
-
-//method to stop the clone from running on random path and remove it from world
-const cloneModeOff = () => {
-    // document.querySelector('#autoplayoff').classList.add('hidden');
-    // document.querySelector('#autoplayon').classList.remove('hidden');
-    if (is_clone_mode_on) {
-        is_clone_mode_on = 0;
-        clearInterval(clone_mode_id);
-        World.remove(world, clone);
-        window.dispatchEvent(remove_clone_evt);
     }
 }

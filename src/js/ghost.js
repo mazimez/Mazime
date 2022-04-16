@@ -45,6 +45,14 @@ const ghostPlayOn = () => {
     }, 3000);
 }
 
+//method to turn off the ghost play
+const ghostplayOff = () => {
+    document.querySelector('#ghostplayoff').classList.add('hidden');
+    document.querySelector('#ghostplayon').classList.remove('hidden');
+    clearInterval(ghost_play_id);
+    World.remove(world, ghost);
+}
+
 //method to move the ghost automatically
 const ghostAutoPlay = () => {
     ghostPlayVisitedGrid = Array(cellsVertical)
@@ -70,13 +78,4 @@ const ghostAutoPlay = () => {
     ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
 
     autoMoveObject(ghost, ghostPlayPathGrid, [getRow(object_to_catch), getColumn(object_to_catch)]);
-}
-
-
-//method to turn off the ghost play
-const ghostplayOff = () => {
-    document.querySelector('#ghostplayoff').classList.add('hidden');
-    document.querySelector('#ghostplayon').classList.remove('hidden');
-    clearInterval(ghost_play_id);
-    World.remove(world, ghost);
 }

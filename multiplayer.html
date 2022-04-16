@@ -175,6 +175,7 @@
         <h1>You Lose!</h1>
         <button id="restart" onclick="restart()">Restart!</button>
     </div>
+    <img class="special hidden" id="special" src="assets/images/sharingan.png" alt="" style=" width: 70px; height: 70px;" onclick="useSpecialAbility()">
     <div class="bg">
         <div class="p-5 text-center">
             <h1 class="mb-3">Choose Mode</h1>
@@ -236,6 +237,9 @@
         //making this device a ghost(joiner)
         whoAmI = 'ghost';
         document.getElementsByClassName('bg')[0].remove()
+
+        //adding the option to use the special ability
+        document.getElementById('special').classList.remove('hidden')
         another_peer_id = prompt("Enter host game id: ");
         connect(another_peer_id)
     }
