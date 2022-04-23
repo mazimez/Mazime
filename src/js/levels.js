@@ -56,6 +56,7 @@ let setLevel = (level) => {
 //next Level
 const nextLevel = () => {
     special_ability_count_left = 3;
+    document.querySelector('#special').classList.remove('deactivate');
     special_ability_wait_time = 2000;
     is_special_ability_in_use = 0;
     is_lose = false;

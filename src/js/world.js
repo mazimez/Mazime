@@ -30,6 +30,18 @@ let is_clone_mode_done;
 let clone_mode_id;
 let clone;
 
+//loading audio files for sound effects
+let teleportation = new Howl({
+    src: [
+        'assets/audio/teleportation.mp3'
+    ],
+});
+let byakugan = new Howl({
+    src: [
+        'assets/audio/byakugan.mp3'
+    ],
+});
+
 //creating the array of the walls(rectangles) that cover the world
 const walls = [
     Bodies.rectangle(width / 2, 0, width, 10, {
@@ -127,7 +139,7 @@ const createMaze = () => {
     going throw horizontal array to put 
     block/wall/rectangle according to array's data
     */
-    horizontals.forEach((row, rowIndex, ) => {
+    horizontals.forEach((row, rowIndex,) => {
         row.forEach((open, columnIndex) => {
             /*
             if the array's value is true, that means there are no wall at that point
@@ -203,7 +215,7 @@ const addControlsToObject = (object) => {
         is_in_phone_mode = 1;
         let acl = new Accelerometer({ frequency: 60 });
         acl.start();
-        setInterval(function() {
+        setInterval(function () {
             const { x, y } = object.velocity;
             let speedx = Math.ceil(acl.x);
             let speedy = Math.ceil(acl.y);
@@ -245,16 +257,16 @@ const addControlsToObject = (object) => {
     } else {
         console.log("PC mode is on");
         var keyState = {};
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             keyState[e.key] = true;
             if (e.code == 'Space') {
                 useSpecialAbility();
             }
         });
-        document.addEventListener('keyup', function(e) {
+        document.addEventListener('keyup', function (e) {
             keyState[e.key] = false;
         });
-        setInterval(function() {
+        setInterval(function () {
             const { x, y } = object.velocity;
             if (keyState['w'] || keyState['ArrowUp']) {
                 if (y < -speedlimit) {
@@ -371,10 +383,9 @@ const changePosition = (object, row, column) => {
 
 //method to teleport he object to random place in maze
 const teleportObject = (object) => {
-    row = randomIntFromInterval(0, cellsVertical - 1);
     column = randomIntFromInterval(0, cellsHorizontal - 1);
-    // var audio = new Audio("assets/audio/teleportation.mp3");
-    // audio.play();
+    row = randomIntFromInterval(0, cellsVertical - 1);
+    // teleportation.play();
     changePosition(object, row, column);
 }
 
@@ -392,7 +403,7 @@ const makeObjectTransparent = (object) => {
         'category': 2,
         'mask': 2,
     };
-    setTimeout(function() {
+    setTimeout(function () {
         window.dispatchEvent(remove_transparency_evt);
         object.render.fillStyle = color;
         object.collisionFilter.category = category;
@@ -647,17 +658,17 @@ const showPath = (startRow, startColumn, endRow, endColumn) => {
                 rowIndex * unitLengthY + (unitLengthY / 2),
                 unitLengthX,
                 3, {
-                    label: 'line',
-                    isStatic: true,
-                    render: {
-                        fillStyle: 'green'
-                    },
-                    collisionFilter: {
-                        group: -1,
-                        category: 2,
-                        mask: 0
-                    }
+                label: 'line',
+                isStatic: true,
+                render: {
+                    fillStyle: 'green'
+                },
+                collisionFilter: {
+                    group: -1,
+                    category: 2,
+                    mask: 0
                 }
+            }
             );
             World.add(world, line);
         })
@@ -673,17 +684,17 @@ const showPath = (startRow, startColumn, endRow, endColumn) => {
                 rowIndex * unitLengthY + unitLengthY,
                 3,
                 unitLengthY, {
-                    label: 'line',
-                    isStatic: true,
-                    render: {
-                        fillStyle: 'green'
-                    },
-                    collisionFilter: {
-                        group: -1,
-                        category: 2,
-                        mask: 0
-                    }
+                label: 'line',
+                isStatic: true,
+                render: {
+                    fillStyle: 'green'
+                },
+                collisionFilter: {
+                    group: -1,
+                    category: 2,
+                    mask: 0
                 }
+            }
             );
             World.add(world, line);
         })
@@ -829,7 +840,7 @@ const activateClone = (object) => {
     is_clone_mode_done = 0;
     let clone_final_row = randomIntFromInterval(0, cellsVertical - 1);
     let clone_final_column = randomIntFromInterval(0, cellsHorizontal - 1);
-    clone_mode_id = setInterval(function() {
+    clone_mode_id = setInterval(function () {
         if (!is_clone_mode_done) {
             clonePlayVisitedGrid = Array(cellsVertical)
                 .fill(null)

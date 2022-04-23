@@ -27,7 +27,7 @@ Runner.run(Runner.create(), engine); //attaching the engine with rendered world
 
 //adding events listeners for collision
 //ball+goal
-window.addEventListener("ball_goal_collision", function(evt) {
+window.addEventListener("ball_goal_collision", function (evt) {
     if (!is_lose) {
         is_won = true;
         if (cellsHorizontal >= 20 || cellsVertical >= 20) {
@@ -53,7 +53,7 @@ window.addEventListener("ball_goal_collision", function(evt) {
     }
 }, false);
 //ball+ghost
-window.addEventListener("ball_ghost_collision", function(evt) {
+window.addEventListener("ball_ghost_collision", function (evt) {
     if (!is_won) {
         is_lose = true;
         if (is_autoplay_on) {
@@ -72,7 +72,7 @@ window.addEventListener("ball_ghost_collision", function(evt) {
 }, false);
 
 //ball clone+ghost
-window.addEventListener("ball_clone_ghost_collision", function(evt) {
+window.addEventListener("ball_clone_ghost_collision", function (evt) {
     if (is_clone_mode_on) {
         deactivateClone();
     }
@@ -104,12 +104,9 @@ const specialAbility = () => {
             teleportObject(ball);
             break;
         case 'neji':
-            //TODO::play the audio but fix the problem of having to load it every time that's making game slow
-            // var audio = loadSound("byakugan.mp3");
-            // var audio_1 = new Audio("assets/audio/byakugan.mp3");
-            // audio_1.play();
+            // byakugan.play();
             showPath(getRow(ball), getColumn(ball), getRow(goal), getColumn(goal));
-            setTimeout(function() {
+            setTimeout(function () {
                 hidePath();
             }, special_ability_wait_time);
             break;
@@ -145,7 +142,7 @@ const useSpecialAbility = () => {
         special_ability_count_left = special_ability_count_left - 1;
         is_special_ability_in_use = 1;
         specialAbility();
-        setTimeout(function() {
+        setTimeout(function () {
             if (special_ability_count_left > 0) {
                 document.querySelector('#special').classList.remove('deactivate');
             }

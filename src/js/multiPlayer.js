@@ -20,11 +20,11 @@ let is_follow_on = 0;
 
 
 //opening connection channel for peer to connect
-peer.on('open', function(id) {
+peer.on('open', function (id) {
     peer_id = id; //assigning value to peer id
 });
-peer.on('connection', function(con) {
-    con.on('data', function(data) {
+peer.on('connection', function (con) {
+    con.on('data', function (data) {
         receiveMessage(data); //passing data to receiver method so it can process it 
     });
 });
@@ -32,7 +32,7 @@ peer.on('connection', function(con) {
 //method to connect peer to another with channel-id (becoming joiner)
 const connect = (id) => {
     conn = peer.connect(id); //making connection by channel id
-    conn.on('open', function(data) {
+    conn.on('open', function (data) {
         is_connected = 1; //setting boolean to 1 if connected
 
         //we are connected(from joiner side), so lets render the game
@@ -88,7 +88,7 @@ const receiveMessage = (data) => {
 
         //connecting this device with first message sender device(joiner)
         conn = peer.connect(another_peer_id);
-        conn.on('open', function(data) {
+        conn.on('open', function (data) {
             is_connected = 1; //setting boolean to 1 if connected
 
             //we are connected(from host side), so lets render the game
@@ -229,7 +229,7 @@ const receiveMessage = (data) => {
 
 //method that will continually send the data to another peer
 const startDataTransfer = () => {
-    setInterval(function() {
+    setInterval(function () {
         if (is_clone_mode_on) {
             switch (whoAmI) {
                 case 'ghost':
@@ -277,7 +277,7 @@ const startDataTransfer = () => {
 
 
 //adding events listeners for collision
-window.addEventListener("ball_goal_collision", function(evt) {
+window.addEventListener("ball_goal_collision", function (evt) {
     if (whoAmI == 'player') {
         if (!is_lose) {
             is_won = true;
@@ -338,7 +338,7 @@ window.addEventListener("ball_goal_collision", function(evt) {
 
 }, false);
 
-window.addEventListener("ball_ghost_collision", function(evt) {
+window.addEventListener("ball_ghost_collision", function (evt) {
     if (whoAmI == 'player') {
         if (!is_won) {
             is_lose = true;
@@ -404,21 +404,21 @@ window.addEventListener("ball_ghost_collision", function(evt) {
     }
 }, false);
 
-window.addEventListener("make_object_transparent", function(evt) {
+window.addEventListener("make_object_transparent", function (evt) {
     conn.send({
         "make_object_transparent": {
             "object": whoAmI,
         },
     });
 }, false);
-window.addEventListener("remove_transparency", function(evt) {
+window.addEventListener("remove_transparency", function (evt) {
     conn.send({
         "remove_transparency": {
             "object": whoAmI,
         },
     });
 }, false);
-window.addEventListener("make_clone", function(evt) {
+window.addEventListener("make_clone", function (evt) {
     conn.send({
         "make_clone": {
             "object": whoAmI,
@@ -426,7 +426,7 @@ window.addEventListener("make_clone", function(evt) {
     });
 }, false);
 //ball clone+ghost
-window.addEventListener("ball_clone_ghost_collision", function(evt) {
+window.addEventListener("ball_clone_ghost_collision", function (evt) {
     if (whoAmI == 'player') {
         deactivateClone();
     }
@@ -443,7 +443,7 @@ window.addEventListener("ball_clone_ghost_collision", function(evt) {
 }, false);
 
 //ball clone+ghost clone
-window.addEventListener("ghost_clone_ball_clone_collision", function(evt) {
+window.addEventListener("ghost_clone_ball_clone_collision", function (evt) {
     if (whoAmI == 'player') {
         deactivateClone();
         ghost.label = "ghost";
@@ -455,7 +455,7 @@ window.addEventListener("ghost_clone_ball_clone_collision", function(evt) {
 }, false);
 
 //ghost clone+ball
-window.addEventListener("ghost_clone_ball_collision", function(evt) {
+window.addEventListener("ghost_clone_ball_collision", function (evt) {
     if (whoAmI == 'player') {
         if (is_clone_mode_on) {
             conn.send({
@@ -486,22 +486,16 @@ const specialAbility = () => {
         case 'neji':
             switch (whoAmI) {
                 case 'ghost':
-                    //TODO::play the audio but fix the problem of having to load it every time that's making game slow
-                    // var audio = loadSound("byakugan.mp3");
-                    // var audio_1 = new Audio("assets/audio/byakugan.mp3");
-                    // audio_1.play();
+                    // byakugan.play();
                     showPath(getRow(ghost), getColumn(ghost), getRow(ball), getColumn(ball));
-                    setTimeout(function() {
+                    setTimeout(function () {
                         hidePath();
                     }, special_ability_wait_time);
                     break;
                 case 'player':
-                    //TODO::play the audio but fix the problem of having to load it every time that's making game slow
-                    // var audio = loadSound("byakugan.mp3");
-                    // var audio_1 = new Audio("assets/audio/byakugan.mp3");
-                    // audio_1.play();
+                    // byakugan.play();
                     showPath(getRow(ball), getColumn(ball), getRow(goal), getColumn(goal));
-                    setTimeout(function() {
+                    setTimeout(function () {
                         hidePath();
                     }, special_ability_wait_time);
                     break;
@@ -515,12 +509,12 @@ const specialAbility = () => {
             is_follow_on = 1;
             switch (whoAmI) {
                 case 'ghost':
-                    follow_id = setInterval(function() {
+                    follow_id = setInterval(function () {
                         followObject(ghost, ball);
                     }, timer);
                     break;
                 case 'player':
-                    follow_id = setInterval(function() {
+                    follow_id = setInterval(function () {
                         followObject(ball, goal);
                     }, timer);
                     break;
@@ -569,7 +563,7 @@ const useSpecialAbility = () => {
         special_ability_count_left = special_ability_count_left - 1;
         is_special_ability_in_use = 1;
         specialAbility();
-        setTimeout(function() {
+        setTimeout(function () {
             if (special_ability_count_left > 0) {
                 document.querySelector('#special').classList.remove('deactivate');
             }
