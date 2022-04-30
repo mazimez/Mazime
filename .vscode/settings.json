@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "Shadow clone feature",
-        "Read Me"
+        "Read Me",
+        "Levels"
     ]
 }

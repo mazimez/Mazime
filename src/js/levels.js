@@ -54,32 +54,29 @@ let setLevel = (level) => {
 
 
 //next Level
-const nextLevel = () => {
+const nextLevel = (is_for_multiplayer = false) => {
     special_ability_count_left = 3;
     document.querySelector('#special').classList.remove('deactivate');
     special_ability_wait_time = 2000;
     is_special_ability_in_use = 0;
     is_lose = false;
     is_won = false;
-    ghostplayOff();
+    if (!is_for_multiplayer) {
+        ghostplayOff();
+    }
     if (level >= 20) {
         console.log("no more level nor now");
     } else {
-        let out = [];
+        deleteMaze();
 
-        //removing the win tag
-        document.querySelector('.winner').classList.add('hidden');
+        //removing the win/lose tag
+        if (!document.querySelector('.winner').classList.contains('hidden')) {
+            document.querySelector('.winner').classList.add('hidden');
+        }
+        if (!document.querySelector('.losser').classList.contains('hidden')) {
+            document.querySelector('.losser').classList.add('hidden');
+        }
 
-        world.bodies.forEach(body => {
-            if (body.label === 'wall') {
-                out.push(body);
-            }
-        });
-
-        //removing the old maze
-        out.forEach((body) => {
-            World.remove(world, body);
-        });
         World.remove(world, ball);
         World.remove(world, goal);
         World.remove(world, ghost);
@@ -140,8 +137,17 @@ const nextLevel = () => {
         createGoalObject();
         World.add(world, goal);
         level++;
-        addControlsToObject(ball);
-        ghostPlayOn();
+
+        if (is_for_multiplayer) {
+            if (whoAmI == 'player') {
+                addControlsToObject(ball);
+            } else {
+                addControlsToObject(ghost);
+            }
+        } else {
+            addControlsToObject(ball);
+            ghostPlayOn();
+        }
     }
 }
 

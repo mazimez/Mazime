@@ -15,7 +15,7 @@ Find the path to goal before the ghost(other player) finds you. selecting differ
 - select the mode of play, single player or multiplayer.
 
 ## Single Player
-- the blue ball is your character and red ball is the computer(ghost). avoid red ball from touching you character and reach to the green box(goal) at bottom right to finish the game and go to next level.
+- the blue ball is your character and red ball is the computer(ghost). avoid red ball from touching your character and reach to the green box(goal) at bottom right to finish the game and go to next level.
 - there is also an option of "Ghost Off" at bottom left, so you can disable the ghost.
 
 ## Multi Player
@@ -35,3 +35,7 @@ Find the path to goal before the ghost(other player) finds you. selecting differ
 - `space` key to use special ability(based on selected character)
 - the red eye looking thing(sharingan) can also be used to activate the special ability (for Mobile Phones)
 - the Special ability can be used only 3 time in each level and it needs 2 seconds to recharge (whenever the sharingan's looks faded that means you can not use special ability right now.)
+
+## Note
+- This game is still in development, so if you find any bugs or have any idea that you want to add in this game then please let me know [here](https://github.com/asif987patel/matter/issues/new)
+ 

@@ -6,6 +6,8 @@ let is_connected = 0; //boolean to know is peer connected with another peer
 let conn; //variable for connection object
 let whoAmI = null; //variable to know that this peer is Player or Ghost
 let level = 1 //the current level
+let should_go_next_level = false;
+let should_other_go_next_level = false;
 
 //TODO::remove this variable if it's not being used
 let can_teleport = true;
@@ -158,7 +160,6 @@ const receiveMessage = (data) => {
         startDataTransfer();
     }
 
-
     //setting the position of player(host) on the ghost(joiner) side
     if (data.ball && whoAmI != 'player') {
         Body.setPosition(ball, { x: data.ball.x, y: data.ball.y });
@@ -223,6 +224,76 @@ const receiveMessage = (data) => {
         }
     }
 
+    //see if our game needs to go to next level or not
+    if (data.should_go_next_level) {
+        //checking if other player wants to continue
+        if (data.should_go_next_level.bool) {
+            should_other_go_next_level = data.should_go_next_level.bool;
+        }
+    }
+
+    //checking if we need to go to next level
+    if (data.go_to_next_level) {
+        special_ability_count_left = 3;
+        document.querySelector('#special').classList.remove('deactivate');
+        special_ability_wait_time = 2000;
+        is_special_ability_in_use = 0;
+        is_lose = false;
+        is_won = false;
+        deleteMaze();
+        //removing the win/lose tag
+        if (!document.querySelector('.winner').classList.contains('hidden')) {
+            document.querySelector('.winner').classList.add('hidden');
+        }
+        if (!document.querySelector('.losser').classList.contains('hidden')) {
+            document.querySelector('.losser').classList.add('hidden');
+        }
+        World.remove(world, ball);
+        World.remove(world, goal);
+        World.remove(world, ghost);
+
+        engine.world.gravity.y = 0;
+
+        if (is_clone_mode_on) {
+            deactivateClone()
+        }
+        hidePath();
+        if (data.go_to_next_level.level) {
+            level = data.go_to_next_level.level;
+        }
+        if (data.go_to_next_level.cellsHorizontal) {
+            cellsHorizontal = data.go_to_next_level.cellsHorizontal;
+        }
+        if (data.go_to_next_level.cellsVertical) {
+            cellsVertical = data.go_to_next_level.cellsVertical;
+        }
+        if (data.go_to_next_level.verticals) {
+            verticals = data.go_to_next_level.verticals;
+        }
+        if (data.go_to_next_level.horizontals) {
+            horizontals = data.go_to_next_level.horizontals;
+        }
+        if (data.go_to_next_level.cellsWidth) {
+            cellsWidth = data.go_to_next_level.cellsWidth;
+        }
+        if (data.go_to_next_level.speedlimit) {
+            speedlimit = data.go_to_next_level.speedlimit;
+        }
+        unitLengthX = width / cellsHorizontal;
+        unitLengthY = height / cellsVertical;
+        createMaze();
+        createPlayerObject();
+        World.add(world, ball);
+        createGhostObject();
+        World.add(world, ghost);
+        createGoalObject();
+        World.add(world, goal);
+        if (whoAmI == 'player') {
+            addControlsToObject(ball);
+        } else {
+            addControlsToObject(ghost);
+        }
+    }
 
 }
 
@@ -287,11 +358,11 @@ window.addEventListener("ball_goal_collision", function (evt) {
             if (is_autoplay_on) {
                 autoplayOff();
             }
-            try {
-                ghostplayOff();
-            } catch (err) {
+            // try {
+            //     ghostplayOff();
+            // } catch (err) {
 
-            }
+            // }
             if (is_clone_mode_on) {
                 window.dispatchEvent(ball_clone_ghost_collision_evt)
                 conn.send({
@@ -312,9 +383,7 @@ window.addEventListener("ball_goal_collision", function (evt) {
         }
     }
     if (whoAmI == 'ghost') {
-        console.log('here1');
         if (!is_won) {
-            console.log('here2');
             is_lose = true;
             if (is_autoplay_on) {
                 autoplayOff();
@@ -570,5 +639,47 @@ const useSpecialAbility = () => {
             is_special_ability_in_use = 0;
         }, special_ability_wait_time);
     }
+
+}
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+const playAgain = async () => {
+    //setting our player's wish of continue to true and sending this data to other player
+    should_go_next_level = true;
+    conn.send({
+        "should_go_next_level": {
+            "object": whoAmI,
+            "bool": should_go_next_level,
+        }
+    });
+
+    //waiting for other player to accept this request for continuing
+    do {
+        await delay(2000);
+    } while (!should_other_go_next_level);
+
+    //to go to next level player has to either win or lose
+    if (!is_won && !is_lose) {
+        return 0;
+    }
+    if (whoAmI == 'player') {
+        //changing the game for next level
+        nextLevel(true);
+        //send the next level's data to other device so they can also go to next level
+        conn.send({
+            "go_to_next_level": {
+                "verticals": verticals,
+                "horizontals": horizontals,
+                "level": level,
+                "cellsHorizontal": cellsHorizontal,
+                "cellsVertical": cellsVertical,
+                "cellsWidth": cellsWidth,
+                "speedlimit": speedlimit,
+            }
+        });
+    }
+
 
 }

@@ -21,8 +21,11 @@ const createGhostObject = () => {
 
 //method to turn on the ghost play
 const ghostPlayOn = () => {
-    document.querySelector('#ghostplayon').classList.add('hidden');
-    document.querySelector('#ghostplayoff').classList.remove('hidden');
+    if (document.querySelector('#ghostplayon')) {
+        document.querySelector('#ghostplayon').classList.add('hidden');
+        document.querySelector('#ghostplayoff').classList.remove('hidden');
+    }
+
     World.remove(world, ghost);
     ghostRadius = Math.min(unitLengthX, unitLengthY) * 0.2; //calculating the radius of the ghost so it will always fit in the game
     ghost = Bodies.circle(
@@ -37,9 +40,9 @@ const ghostPlayOn = () => {
         }
     );
     World.add(world, ghost);
-    setTimeout(function() {
+    setTimeout(function () {
         let ghostTimer = ghost_speed * 10;
-        ghost_play_id = setInterval(function() {
+        ghost_play_id = setInterval(function () {
             ghostAutoPlay();
         }, ghostTimer);
     }, 3000);
@@ -47,8 +50,11 @@ const ghostPlayOn = () => {
 
 //method to turn off the ghost play
 const ghostplayOff = () => {
-    document.querySelector('#ghostplayoff').classList.add('hidden');
-    document.querySelector('#ghostplayon').classList.remove('hidden');
+    if (document.querySelector('#ghostplayon')) {
+        document.querySelector('#ghostplayoff').classList.add('hidden');
+        document.querySelector('#ghostplayon').classList.remove('hidden');
+    }
+
     clearInterval(ghost_play_id);
     World.remove(world, ghost);
 }

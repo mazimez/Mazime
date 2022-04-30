@@ -202,6 +202,20 @@ const createMaze = () => {
 
 }
 
+//making the function to delete the maze
+const deleteMaze = () => {
+    let out = [];
+    world.bodies.forEach(body => {
+        if (body.label === 'wall') {
+            out.push(body);
+        }
+    });
+    //removing the old maze
+    out.forEach((body) => {
+        World.remove(world, body);
+    });
+}
+
 
 
 //function to add the controls on the object
@@ -334,12 +348,12 @@ Events.on(engine, 'collisionStart', event => {
 });
 
 //TODO::check if we need this method or not
-function enterEvent(event) {
-    if (['Enter', ' '].includes(event.key)) {
-        document.removeEventListener('keypress', enterEvent);
-        nextLevel();
-    }
-}
+// function enterEvent(event) {
+//     if (['Enter', ' '].includes(event.key)) {
+//         document.removeEventListener('keypress', enterEvent);
+//         nextLevel();
+//     }
+// }
 
 
 /*useful methods*/
