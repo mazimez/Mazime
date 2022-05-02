@@ -34,10 +34,12 @@ let setLevel = (level) => {
     if (speedlimit < 4) {
         speedlimit = 4;
     }
-    ghost_speed = 30 - ((level - 1) * 5)
-    if (ghost_speed < 5) {
-        ghost_speed = 5;
-    }
+    ghost_speed = speedlimit * 1.5;
+    autoPlaySpeed = 0.1 * (27 - ghost_speed);
+    // ghost_speed = 10 - ((level - 1) * 5)
+    // if (ghost_speed < 5) {
+    //     ghost_speed = 5;
+    // }
 
 
     //creating the goal to finish the game
@@ -103,9 +105,11 @@ const nextLevel = (is_for_multiplayer = false) => {
         } else {
             speedlimit = speedlimit - 1;
         }
-        if (ghost_speed > 5) {
-            ghost_speed = ghost_speed - 5;
-        }
+        ghost_speed = speedlimit * 1.5;
+        autoPlaySpeed = 0.1 * (27 - ghost_speed);
+        // if (ghost_speed > 5) {
+        //     ghost_speed = ghost_speed - 5;
+        // }
 
         unitLengthX = width / cellsHorizontal;
         unitLengthY = height / cellsVertical;

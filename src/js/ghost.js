@@ -1,7 +1,8 @@
 let ghost; //the variable to store the object label as ghost
 let ghostRadius; //radius of ghost
-let ghost_speed = 30; //speed limit of ghost
+let ghost_speed = 10; //speed limit of ghost
 let ghost_play_id;
+let autoPlaySpeed = 0.1 * (27 - ghost_speed);
 
 //method to create the object of ghost
 const createGhostObject = () => {
@@ -41,7 +42,7 @@ const ghostPlayOn = () => {
     );
     World.add(world, ghost);
     setTimeout(function () {
-        let ghostTimer = ghost_speed * 10;
+        let ghostTimer = ghost_speed * 20;
         ghost_play_id = setInterval(function () {
             ghostAutoPlay();
         }, ghostTimer);
@@ -58,6 +59,7 @@ const ghostplayOff = () => {
     clearInterval(ghost_play_id);
     World.remove(world, ghost);
 }
+
 
 //method to move the ghost automatically
 const ghostAutoPlay = () => {
@@ -83,5 +85,5 @@ const ghostAutoPlay = () => {
     );
     ghostPlayPathGrid[getRow(ghost)][getColumn(ghost)] = true;
 
-    autoMoveObject(ghost, ghostPlayPathGrid, [getRow(object_to_catch), getColumn(object_to_catch)]);
+    autoMoveObject(ghost, ghostPlayPathGrid, [getRow(object_to_catch), getColumn(object_to_catch)], autoPlaySpeed);
 }
