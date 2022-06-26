@@ -37,5 +37,7 @@ Find the path to goal before the ghost(other player) finds you. selecting differ
 - the Special ability can be used only 3 time in each level and it needs 2 seconds to recharge (whenever the sharingan's looks faded that means you can not use special ability right now.)
 
 ## Note
+- This game was initiated by [@StephenGrider](https://github.com/StephenGrider) in the [Udemy course](https://www.udemy.com/course/javascript-beginners-complete-tutorial/). I just like this game and try to improve it. please check out the course to learn more about JavaScript and this game too.
+- [@StephenGrider](https://github.com/StephenGrider), I Hope you don't mind me working on your game and keep improving it :sweat_smile: .
 - This game is still in development, so if you find any bugs or have any idea that you want to add in this game then please let me know [here](https://github.com/asif987patel/matter/issues/new)
  
